@@ -1,0 +1,10 @@
+name: BetterPlayerVaults
+version: 1.0
+main: software.bigbade.playervaults.BetterPlayerVaults
+commands:
+  playervault:
+    description: Opens a player's vault
+    usage: /playervault (number)
+    aliases:
+      - pv
+      - vault

@@ -1,0 +1,7 @@
+#BetterPlayerVaults configuration
+
+#Send statistics to BStats. Viewable at:
+stats=true
+
+#How the vaults are saved. Choices are: persistent (Stores PersistentData), flatfile (writes data to a flatfile)
+saveType="persistent"
