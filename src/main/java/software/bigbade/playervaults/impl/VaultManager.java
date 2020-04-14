@@ -1,6 +1,4 @@
 package software.bigbade.playervaults.impl;
-
-import jdk.internal.jline.internal.Nullable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -10,6 +8,7 @@ import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.loading.IVaultLoader;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
