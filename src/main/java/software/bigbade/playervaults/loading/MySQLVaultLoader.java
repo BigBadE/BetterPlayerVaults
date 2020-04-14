@@ -14,6 +14,11 @@ public class MySQLVaultLoader implements IVaultLoader {
 
     @Override
     public void saveVault(IPlayerVault vault) {
+        //WIP
+    }
 
+    @Override
+    public String getName() {
+        return "mysql";
     }
 }

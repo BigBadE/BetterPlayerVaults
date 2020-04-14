@@ -8,7 +8,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import software.bigbade.playervaults.BetterPlayerVaults;
 import software.bigbade.playervaults.api.IPlayerVault;
-import software.bigbade.playervaults.utils.SerializationUtils;
+import software.bigbade.playervaults.serialization.SerializationUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +45,11 @@ public class PersistentVaultLoader implements IVaultLoader {
         PersistentDataContainer data = vault.getPlayer().getPersistentDataContainer();
         String serialized = SerializationUtils.serialize(saving);
         data.set(getKey(vault.getNumber()), PersistentDataType.STRING, serialized);
+    }
+
+    @Override
+    public String getName() {
+        return "persistent";
     }
 
     private NamespacedKey getKey(int slot) {

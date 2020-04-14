@@ -1,11 +1,8 @@
-package software.bigbade.playervaults.utils;
+package software.bigbade.playervaults.managers;
 
 import lombok.RequiredArgsConstructor;
 import software.bigbade.playervaults.BetterPlayerVaults;
-<<<<<<< HEAD
 import software.bigbade.playervaults.loading.FlatfileVaultLoader;
-=======
->>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
 import software.bigbade.playervaults.loading.IVaultLoader;
 import software.bigbade.playervaults.loading.PersistentVaultLoader;
 
@@ -18,13 +15,10 @@ public class LoaderManager {
     }
 
     public IVaultLoader getVaultLoader(String loader) {
-        if(loader.equals("persistent")) {
+        if (loader.equals("persistent")) {
             return new PersistentVaultLoader(main);
-<<<<<<< HEAD
-        } else if(loader.equals("flatfile")) {
+        } else if (loader.equals("flatfile")) {
             return new FlatfileVaultLoader(main.getDataFolder().getAbsolutePath());
-=======
->>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
         }
         return null;
     }
