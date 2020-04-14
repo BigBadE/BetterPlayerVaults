@@ -7,12 +7,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.command.VaultCommand;
+import software.bigbade.playervaults.impl.VaultManager;
 import software.bigbade.playervaults.listener.VaultCloseListener;
 import software.bigbade.playervaults.loading.IVaultLoader;
 import software.bigbade.playervaults.loading.LibraryLoader;
-import software.bigbade.playervaults.utils.LoaderManager;
-import software.bigbade.playervaults.utils.MetricsManager;
-import software.bigbade.playervaults.impl.VaultManager;
+import software.bigbade.playervaults.managers.LoaderManager;
+import software.bigbade.playervaults.managers.MetricsManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,6 +25,7 @@ public class BetterPlayerVaults extends JavaPlugin {
 
     private FileConfiguration configuration;
 
+    @Getter
     private IVaultLoader vaultLoader;
 
     private IVaultManager vaultManager;

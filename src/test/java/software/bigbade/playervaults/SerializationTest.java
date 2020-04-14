@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import software.bigbade.playervaults.utils.SerializationUtils;
+import software.bigbade.playervaults.serialization.SerializationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ItemStack.class })
+@PrepareForTest({ItemStack.class})
 public class SerializationTest {
 
     @Test(expected = ExceptionInInitializerError.class)

@@ -4,8 +4,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import software.bigbade.playervaults.api.IPlayerVault;
+import software.bigbade.playervaults.serialization.SerializationUtils;
 import software.bigbade.playervaults.utils.FileUtils;
-import software.bigbade.playervaults.utils.SerializationUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ public class FlatfileVaultLoader implements IVaultLoader {
 
     public FlatfileVaultLoader(String dataFolder) {
         this.dataFolder = dataFolder + "\\vaults\\";
-        if(!Files.isDirectory(Paths.get(dataFolder)))
+        if (!Files.isDirectory(Paths.get(dataFolder)))
             FileUtils.createDirectory(Paths.get(dataFolder));
     }
 
@@ -36,12 +36,17 @@ public class FlatfileVaultLoader implements IVaultLoader {
         FileUtils.delete(path);
         Inventory inventory = vault.getInventory();
         Map<Integer, ItemStack> items = new HashMap<>();
-        for(int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack found = inventory.getItem(i);
-            if(found != null) {
+            if (found != null) {
                 items.put(i, found);
             }
         }
         FileUtils.write(path, SerializationUtils.serialize(items));
+    }
+
+    @Override
+    public String getName() {
+        return "flatfile";
     }
 }

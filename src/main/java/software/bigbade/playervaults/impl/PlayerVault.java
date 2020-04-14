@@ -17,7 +17,7 @@ public class PlayerVault implements IPlayerVault {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof IPlayerVault) {
+        if (obj instanceof IPlayerVault) {
             return ((IPlayerVault) obj).getPlayer().equals(player);
         }
         return false;

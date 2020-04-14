@@ -1,0 +1,16 @@
+language: java
+
+env:
+  global:
+    - JAVA_TOOL_OPTIONS=-Dhttps.protocols=TLSv1.2
+
+jdk:
+  - openjdk8
+
+before_install:
+  - mvn -U clean
+
+script: "mvn cobertura:cobertura"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
