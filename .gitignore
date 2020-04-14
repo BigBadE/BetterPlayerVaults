@@ -1,5 +1,5 @@
 # Intellij
-.idea-temp/
+.idea/
 *.iml
 *.iws
 dependency-reduced-pom.xml
