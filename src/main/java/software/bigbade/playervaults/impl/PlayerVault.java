@@ -14,6 +14,7 @@ public class PlayerVault implements IPlayerVault {
     private final Inventory inventory;
     @Getter
     private final int number;
+<<<<<<< HEAD
 
     @Override
     public boolean equals(Object obj) {
@@ -27,4 +28,6 @@ public class PlayerVault implements IPlayerVault {
     public int hashCode() {
         return player.getUniqueId().hashCode();
     }
+=======
+>>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
 }

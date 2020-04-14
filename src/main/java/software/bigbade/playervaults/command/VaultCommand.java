@@ -8,19 +8,30 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+<<<<<<< HEAD
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.loading.IVaultLoader;
 
 import javax.annotation.Nonnull;
+=======
+import software.bigbade.playervaults.loading.IVaultLoader;
+
+>>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
 import java.util.Map;
 
 @RequiredArgsConstructor
 public class VaultCommand implements CommandExecutor {
     private final IVaultLoader loader;
+<<<<<<< HEAD
     private final IVaultManager vaultManager;
 
     @Override
     public boolean onCommand(@Nonnull CommandSender commandSender, @Nonnull Command command, @Nonnull String s, @Nonnull String[] strings) {
+=======
+
+    @Override
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+>>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
         if(!(commandSender instanceof Player))
             return false;
         Player player = (Player) commandSender;

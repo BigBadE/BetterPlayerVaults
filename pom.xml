@@ -57,12 +57,15 @@
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+=======
+>>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
         <!--Uses for stats-->
         <dependency>
             <groupId>org.bstats</groupId>
