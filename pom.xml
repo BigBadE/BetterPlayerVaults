@@ -57,15 +57,25 @@
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-<<<<<<< HEAD
+        <!--MongoDB-->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>4.0.2</version>
             <scope>provided</scope>
         </dependency>
-=======
->>>>>>> 717768a3a7e522fd24fa46c46194f40c00773874
+        <!--MySQL-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.19</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!--Uses for stats-->
         <dependency>
             <groupId>org.bstats</groupId>

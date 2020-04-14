@@ -18,6 +18,8 @@ public class FlatfileVaultLoader implements IVaultLoader {
 
     public FlatfileVaultLoader(String dataFolder) {
         this.dataFolder = dataFolder + "\\vaults\\";
+        if(!Files.isDirectory(Paths.get(dataFolder)))
+            FileUtils.createDirectory(Paths.get(dataFolder));
     }
 
     @Override

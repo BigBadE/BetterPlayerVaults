@@ -2,7 +2,10 @@ package software.bigbade.playervaults.utils;
 
 import software.bigbade.playervaults.BetterPlayerVaults;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -35,5 +38,22 @@ public final class FileUtils {
             BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not read file", e);
         }
         return new byte[0];
+    }
+
+    public static void createDirectory(Path path) {
+        try {
+            Files.createDirectory(path);
+        } catch (IOException e) {
+            BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not create data directory", e);
+        }
+    }
+
+    public static InputStream createStream(URL url) {
+        try {
+            return url.openStream();
+        } catch (IOException e) {
+            BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not connect to URL", e);
+        }
+        return null;
     }
 }
