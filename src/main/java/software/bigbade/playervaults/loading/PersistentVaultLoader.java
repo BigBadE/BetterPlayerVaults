@@ -25,18 +25,18 @@ public class PersistentVaultLoader implements IVaultLoader {
     public Inventory getVault(Player player, int vault) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         NamespacedKey key = getKey(vault);
-        if (!data.has(key, PersistentDataType.STRING)) {
+        if (!data.has(key, PersistentDataType.BYTE_ARRAY)) {
             return Bukkit.createInventory(null, 27, "Vault " + vault);
         }
-        String serialized = data.get(keys.get(vault), PersistentDataType.STRING);
+        byte[] serialized = data.get(keys.get(vault), PersistentDataType.BYTE_ARRAY);
         Objects.requireNonNull(serialized);
         return SerializationUtils.deserialize(serialized);
     }
 
     @Override
     public void saveVault(IPlayerVault vault) {
-        PersistentDataContainer data = vault.getPlayer().getPersistentDataContainer();
-        data.set(getKey(vault.getNumber()), PersistentDataType.STRING, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
+        PersistentDataContainer data = Objects.requireNonNull(Bukkit.getPlayer(vault.getOwner())).getPersistentDataContainer();
+        data.set(getKey(vault.getNumber()), PersistentDataType.BYTE_ARRAY, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
     }
 
     @Override

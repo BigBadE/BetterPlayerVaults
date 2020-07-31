@@ -2,14 +2,15 @@ package software.bigbade.playervaults.impl;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import software.bigbade.playervaults.api.IPlayerVault;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class PlayerVault implements IPlayerVault {
     @Getter
-    private final Player player;
+    private final UUID owner;
     @Getter
     private final Inventory inventory;
     @Getter
@@ -17,14 +18,17 @@ public class PlayerVault implements IPlayerVault {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IPlayerVault) {
-            return ((IPlayerVault) obj).getPlayer().equals(player);
+        if(obj == null) {
+            return false;
+        }
+        if (IPlayerVault.class.isAssignableFrom(obj.getClass())) {
+            return ((IPlayerVault) obj).getOwner().equals(getOwner());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return player.getUniqueId().hashCode();
+        return getOwner().hashCode();
     }
 }

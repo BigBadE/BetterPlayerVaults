@@ -31,8 +31,20 @@ public final class SerializationUtils {
      * @return Deserialized inventory
      */
     public static Inventory deserialize(@Nonnull String data) {
-        JsonObject json = new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject();
+        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject());
+    }
 
+    /**
+     * Deserializes given data
+     *
+     * @param data Serialized data
+     * @return Deserialized inventory
+     */
+    public static Inventory deserialize(byte[] data) {
+        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject());
+    }
+
+    private static Inventory deserialize(JsonObject json) {
         int size = json.get("size").getAsInt();
         String title = "";
         if(json.has("name")) {
@@ -43,7 +55,7 @@ public final class SerializationUtils {
         for (JsonElement element : json.get("items").getAsJsonArray()) {
             JsonObject item = element.getAsJsonObject();
             Map<String, Object> map = new HashMap<>();
-            for(Map.Entry<String, JsonElement> entry : item.entrySet()) {
+            for(Map.Entry<String, JsonElement> entry : item.get("item").getAsJsonObject().entrySet()) {
                 if(entry.getKey().equals(INDEX)) {
                     continue;
                 }
@@ -61,7 +73,7 @@ public final class SerializationUtils {
      * @param inventory Inventory to serialize
      * @return Serialized vault
      */
-    public static String serialize(Inventory inventory, String title) {
+    public static byte[] serialize(Inventory inventory, String title) {
         JsonObject json = new JsonObject();
         json.addProperty("size", inventory.getSize());
         json.addProperty("name", title);
@@ -72,9 +84,7 @@ public final class SerializationUtils {
                 continue;
             }
             JsonObject itemObject = new JsonObject();
-            for(Map.Entry<String, Object> entry : item.serialize().entrySet()) {
-                itemObject.add(entry.getKey(), serialize(entry.getValue()));
-            }
+            itemObject.add("item", serialize(item));
             itemObject.addProperty(INDEX, i);
             itemArray.add(itemObject);
         }
@@ -107,10 +117,12 @@ public final class SerializationUtils {
             values.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
             values.putAll(serializable.serialize());
             JsonObject object = new JsonObject();
-            for(Map.Entry<String, Object> entry : values.entrySet()) {
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
                 object.add(entry.getKey(), serialize(entry.getValue()));
             }
             return object;
+        } else if(value instanceof Number) {
+            return new JsonPrimitive((Number) value);
         } else {
             return new JsonPrimitive(value.toString());
         }

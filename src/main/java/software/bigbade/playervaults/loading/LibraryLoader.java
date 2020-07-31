@@ -5,6 +5,7 @@ import software.bigbade.playervaults.BetterPlayerVaults;
 import software.bigbade.playervaults.utils.FileUtils;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,12 +19,12 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 public class LibraryLoader {
-    private final String libraryFolder;
+    private final File libraryFolder;
 
     public LibraryLoader(String dataFolder) {
-        libraryFolder = dataFolder + "\\libraries\\";
-        if(!Files.isDirectory(Paths.get(libraryFolder))) {
-            FileUtils.createDirectory(Paths.get(libraryFolder));
+        libraryFolder = new File(dataFolder, "libraries");
+        if(!libraryFolder.exists()) {
+            FileUtils.createDirectory(libraryFolder);
         }
     }
 

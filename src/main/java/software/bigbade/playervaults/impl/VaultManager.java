@@ -26,7 +26,7 @@ public class VaultManager implements IVaultManager {
     @Nullable
     public IPlayerVault getVault(Player player) {
         for(IPlayerVault vault : vaults) {
-            if(vault.getPlayer().equals(player)) {
+            if(vault.getOwner().equals(player.getUniqueId())) {
                 return vault;
             }
         }
@@ -35,13 +35,12 @@ public class VaultManager implements IVaultManager {
 
     public void openVault(Player player, int vaultNumber) {
         Inventory inventory = vaultLoader.getVault(player, vaultNumber);
-        IPlayerVault vault = new PlayerVault(player, inventory, vaultNumber);
+        IPlayerVault vault = new PlayerVault(player.getUniqueId(), inventory, vaultNumber);
         vaults.add(vault);
         player.openInventory(inventory);
     }
 
     public void closeVault(IPlayerVault vault) {
-        vault.getPlayer().closeInventory();
         vaultLoader.saveVault(vault);
         vaults.remove(vault);
     }

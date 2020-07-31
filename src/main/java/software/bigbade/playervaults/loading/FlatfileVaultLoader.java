@@ -7,35 +7,32 @@ import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.serialization.SerializationUtils;
 import software.bigbade.playervaults.utils.FileUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 
 public class FlatfileVaultLoader implements IVaultLoader {
-    private final String dataFolder;
+    private final File dataFolder;
 
-    public FlatfileVaultLoader(String dataFolder) {
-        this.dataFolder = dataFolder + "\\vaults\\";
-        if (!Files.isDirectory(Paths.get(dataFolder))) {
-            FileUtils.createDirectory(Paths.get(dataFolder));
+    public FlatfileVaultLoader(String folderPath) {
+        dataFolder = new File(folderPath, "vaults");
+        if (!dataFolder.exists()) {
+            FileUtils.createDirectory(dataFolder);
         }
     }
 
     @Override
     public Inventory getVault(Player player, int vault) {
-        Path path = Paths.get(dataFolder + player.getUniqueId().toString());
-        if (!Files.exists(path)) {
+        File dataFile = new File(dataFolder, player.getUniqueId().toString());
+        if (!dataFile.exists()) {
             return Bukkit.createInventory(null, 27, "Vault " + vault);
         }
-        return SerializationUtils.deserialize(new String(FileUtils.read(path), StandardCharsets.UTF_8));
+        return SerializationUtils.deserialize(FileUtils.read(dataFile));
     }
 
     @Override
     public void saveVault(IPlayerVault vault) {
-        Path path = Paths.get(dataFolder + vault.getPlayer().getUniqueId().toString());
-        FileUtils.delete(path);
-        FileUtils.write(path, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
+        File file = new File(dataFolder, vault.getOwner().toString());
+        FileUtils.delete(file);
+        FileUtils.write(file, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
     }
 
     @Override

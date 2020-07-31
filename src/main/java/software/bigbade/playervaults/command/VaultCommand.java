@@ -7,13 +7,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import software.bigbade.playervaults.api.IVaultManager;
-import software.bigbade.playervaults.loading.IVaultLoader;
 
 import javax.annotation.Nonnull;
 
 @RequiredArgsConstructor
 public class VaultCommand implements CommandExecutor {
-    private final IVaultLoader loader;
     private final IVaultManager vaultManager;
 
     @Override
@@ -27,7 +25,6 @@ public class VaultCommand implements CommandExecutor {
         }
         Player player = (Player) commandSender;
         vaultManager.openVault(player, 1);
-        player.openInventory(loader.getVault(player, 1));
         return true;
     }
 }

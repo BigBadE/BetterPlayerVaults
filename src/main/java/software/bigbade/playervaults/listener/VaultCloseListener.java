@@ -7,18 +7,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
-import software.bigbade.playervaults.loading.IVaultLoader;
 
 @RequiredArgsConstructor
 public class VaultCloseListener implements Listener {
-    private final IVaultLoader loader;
     private final IVaultManager vaultManager;
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         IPlayerVault vault = vaultManager.getVault((Player) event.getPlayer());
         if (vault != null) {
-            loader.saveVault(vault);
+            vaultManager.closeVault(vault);
         }
     }
 }

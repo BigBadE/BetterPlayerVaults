@@ -1,12 +1,13 @@
 package software.bigbade.playervaults.api;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import java.util.UUID;
 
 public interface IPlayerVault {
     Inventory getInventory();
 
     int getNumber();
 
-    Player getPlayer();
+    UUID getOwner();
 }

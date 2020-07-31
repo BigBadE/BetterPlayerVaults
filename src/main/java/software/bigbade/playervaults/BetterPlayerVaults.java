@@ -1,9 +1,12 @@
 package software.bigbade.playervaults;
 
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.command.VaultCommand;
@@ -14,6 +17,7 @@ import software.bigbade.playervaults.loading.LibraryLoader;
 import software.bigbade.playervaults.managers.LoaderManager;
 import software.bigbade.playervaults.managers.MetricsManager;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
@@ -29,22 +33,27 @@ public class BetterPlayerVaults extends JavaPlugin {
     private IVaultLoader vaultLoader;
     private IVaultManager vaultManager;
 
-    public static void setPluginLogger(Logger pluginLogger) {
-        if (BetterPlayerVaults.pluginLogger != null) {
-            throw new IllegalStateException("Tried to set already-set logger!");
-        }
-        BetterPlayerVaults.pluginLogger = pluginLogger;
+    //Required for MockBukkit
+    public BetterPlayerVaults() {
+        super();
+    }
+
+    //Required for MockBukkit
+    protected BetterPlayerVaults(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
     }
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         version = Integer.parseInt(Bukkit.getVersion().split("\\.")[1]);
 
         setPluginLogger(getLogger());
 
         configuration = getConfig();
         loadVaultLoader();
-        if (configuration.getBoolean("stats", true)) {
+
+        if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {
             new MetricsManager(this);
         }
 
@@ -54,8 +63,8 @@ public class BetterPlayerVaults extends JavaPlugin {
 
         vaultManager = new VaultManager(vaultLoader);
 
-        Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultLoader, vaultManager), this);
-        Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultLoader, vaultManager));
+        Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultManager), this);
+        Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultManager));
     }
 
     private void loadVaultLoader() {
@@ -88,9 +97,18 @@ public class BetterPlayerVaults extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (vaultManager == null) {
+            return;
+        }
         for (IPlayerVault vault : vaultManager.getVaults()) {
             vaultManager.closeVault(vault);
         }
         vaultManager.clearVaults();
+    }
+
+    public static void setPluginLogger(Logger pluginLogger) {
+        if(BetterPlayerVaults.pluginLogger == null) {
+            BetterPlayerVaults.pluginLogger = pluginLogger;
+        }
     }
 }
