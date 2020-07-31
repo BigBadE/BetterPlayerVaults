@@ -22,8 +22,9 @@ public class LibraryLoader {
 
     public LibraryLoader(String dataFolder) {
         libraryFolder = dataFolder + "\\libraries\\";
-        if(!Files.isDirectory(Paths.get(libraryFolder)))
+        if(!Files.isDirectory(Paths.get(libraryFolder))) {
             FileUtils.createDirectory(Paths.get(libraryFolder));
+        }
     }
 
     @SneakyThrows
@@ -34,11 +35,11 @@ public class LibraryLoader {
         }
         URL[] urls = new URL[] { new URL("jar:file:" + path + "!/") };
         try (URLClassLoader classLoader = new URLClassLoader(urls, LibraryLoader.class.getClassLoader())) {
-            loadJar(path, classLoader);
+            LibraryLoader.loadJar(path, classLoader);
         }
     }
 
-    private void loadJar(String path, URLClassLoader classLoader) {
+    private static void loadJar(String path, URLClassLoader classLoader) {
         try (JarFile jarFile = new JarFile(path)) {
             Enumeration<JarEntry> enumerator = jarFile.entries();
             while (enumerator.hasMoreElements()) {

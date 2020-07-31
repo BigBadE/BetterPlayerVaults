@@ -21,17 +21,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BetterPlayerVaults extends JavaPlugin {
-    private int version;
-
-    private FileConfiguration configuration;
-
-    @Getter
-    private IVaultLoader vaultLoader;
-
-    private IVaultManager vaultManager;
-
     @Getter
     private static Logger pluginLogger;
+    private int version;
+    private FileConfiguration configuration;
+    @Getter
+    private IVaultLoader vaultLoader;
+    private IVaultManager vaultManager;
+
+    public static void setPluginLogger(Logger pluginLogger) {
+        if (BetterPlayerVaults.pluginLogger != null) {
+            throw new IllegalStateException("Tried to set already-set logger!");
+        }
+        BetterPlayerVaults.pluginLogger = pluginLogger;
+    }
 
     @Override
     public void onEnable() {
@@ -40,24 +43,19 @@ public class BetterPlayerVaults extends JavaPlugin {
         setPluginLogger(getLogger());
 
         configuration = getConfig();
+        loadVaultLoader();
         if (configuration.getBoolean("stats", true)) {
             new MetricsManager(this);
         }
 
-        loadVaultLoader();
-        if (vaultLoader == null)
+        if (vaultLoader == null) {
             return;
+        }
 
         vaultManager = new VaultManager(vaultLoader);
 
         Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultLoader, vaultManager), this);
         Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultLoader, vaultManager));
-    }
-
-    private static void setPluginLogger(Logger pluginLogger) {
-        if (BetterPlayerVaults.pluginLogger != null)
-            throw new IllegalStateException("Tried to set already-set logger!");
-        BetterPlayerVaults.pluginLogger = pluginLogger;
     }
 
     private void loadVaultLoader() {
@@ -68,8 +66,9 @@ public class BetterPlayerVaults extends JavaPlugin {
             getPluginLogger().log(Level.SEVERE, "Invalid saveType set! Options are: flatfile, persistent (1.14+), mysql, mongodb");
             Bukkit.getPluginManager().disablePlugin(this);
         } else {
-            if (loader.equals("mysql") || loader.equals("mongodb"))
+            if (loader.equals("mysql") || loader.equals("mongodb")) {
                 Bukkit.getScheduler().runTaskAsynchronously(this, () -> new LibraryLoader(getDataFolder().getAbsolutePath()).loadLibrary(loader, getDownload(loader)));
+            }
             vaultLoader = loaderManager.getVaultLoader(loader);
         }
     }

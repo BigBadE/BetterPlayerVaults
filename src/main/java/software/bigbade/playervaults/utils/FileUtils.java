@@ -2,9 +2,11 @@ package software.bigbade.playervaults.utils;
 
 import software.bigbade.playervaults.BetterPlayerVaults;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -24,7 +26,7 @@ public final class FileUtils {
 
     public static void write(Path path, String data) {
         try {
-            Files.write(path, data.getBytes());
+            Files.write(path, data.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not write to file", e);
         }
@@ -47,6 +49,7 @@ public final class FileUtils {
         }
     }
 
+    @Nullable
     public static InputStream createStream(URL url) {
         try {
             return url.openStream();

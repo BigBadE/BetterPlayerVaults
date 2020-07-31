@@ -1,7 +1,7 @@
 package software.bigbade.playervaults.impl;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import software.bigbade.playervaults.api.IPlayerVault;
@@ -26,15 +26,15 @@ public class VaultManager implements IVaultManager {
     @Nullable
     public IPlayerVault getVault(Player player) {
         for(IPlayerVault vault : vaults) {
-            if(vault.getPlayer().equals(player))
+            if(vault.getPlayer().equals(player)) {
                 return vault;
+            }
         }
         return null;
     }
 
     public void openVault(Player player, int vaultNumber) {
-        Inventory inventory = Bukkit.createInventory(null, 27, "Vault " + vaultNumber);
-        vaultLoader.getVault(player, vaultNumber).forEach(inventory::setItem);
+        Inventory inventory = vaultLoader.getVault(player, vaultNumber);
         IPlayerVault vault = new PlayerVault(player, inventory, vaultNumber);
         vaults.add(vault);
         player.openInventory(inventory);
@@ -47,6 +47,7 @@ public class VaultManager implements IVaultManager {
     }
 
     public void clearVaults() {
+        vaults.forEach(vaultLoader::saveVault);
         vaults.clear();
     }
 }

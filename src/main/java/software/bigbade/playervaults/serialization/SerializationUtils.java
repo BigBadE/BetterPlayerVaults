@@ -1,138 +1,145 @@
 package software.bigbade.playervaults.serialization;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import software.bigbade.playervaults.BetterPlayerVaults;
-import software.bigbade.playervaults.utils.ReflectionUtils;
+import software.bigbade.playervaults.utils.CompressionUtil;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
 
-/**
- * Handles serialization for the entire plugin.
- * Format:
- * [#; Start of item, where # is the slot
- * = Between the key and value
- * ; Marks end of value
- * | Marks beginning/end of non-list value
- * {} Marks beginning/end of list value
- * { Marks beginning of ItemMeta
- * ] Marks end of item
- *
- * @see SerializationTypes
- */
 public final class SerializationUtils {
-    private static final Method deserializeMeta;
-    private static final Class<?> deserializeMetaClass;
-
-    static {
-        //Load deserialization method from CraftMetaItem
-        deserializeMetaClass = ReflectionUtils.getCraftBukkitClass("inventory.CraftMetaItem$SerializableMeta");
-        Objects.requireNonNull(deserializeMetaClass);
-        deserializeMeta = ReflectionUtils.getMethod(deserializeMetaClass, "deserialize");
-    }
-
-    private SerializationUtils() {
-    }
+    private static final String INDEX = "index";
+    private SerializationUtils() { }
 
     /**
      * Deserializes given data
      *
      * @param data Serialized data
-     * @return Map of slot numbers and itemstacks
+     * @return Deserialized inventory
      */
-    public static Map<Integer, ItemStack> deserialize(@Nonnull String data) {
-        Map<Integer, ItemStack> found = new HashMap<>();
-        String current = data;
-        while (current.startsWith("[")) {
-            current = current.replaceFirst("\\[", "");
-            int slot = Integer.parseInt(current.split(";", 2)[0]);
-            current = current.split(";", 2)[1];
-            Map<String, Object> map = deserializeMap(current);
-            found.put(slot, ItemStack.deserialize(map));
-            current = current.split("]", 2)[1];
-        }
-        return found;
-    }
+    public static Inventory deserialize(@Nonnull String data) {
+        JsonObject json = new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject();
 
-    /**
-     * Takes a serialized map and deserializes it
-     *
-     * @param current Serialized map
-     * @return Deserialized version
-     */
-    public static Map<String, Object> deserializeMap(String current) {
-        Map<String, Object> itemData = new HashMap<>();
-        while (!current.startsWith("}") && !current.startsWith("]")) {
-            String[] split = current.split("=", 2);
-            itemData.put(split[0], deserializeValue(split[1]));
-            current = current.split(";", 2)[1];
+        int size = json.get("size").getAsInt();
+        String title = "";
+        if(json.has("name")) {
+            title = json.get("name").getAsString();
         }
-        return itemData;
-    }
+        Inventory inventory = Bukkit.createInventory(null, size, title);
 
-    private static Object deserializeValue(String serializedValue) {
-        for (SerializationLists lists : SerializationLists.values()) {
-            if (serializedValue.startsWith(lists.getSymbol())) {
-                return lists.deserialize(serializedValue);
+        for (JsonElement element : json.get("items").getAsJsonArray()) {
+            JsonObject item = element.getAsJsonObject();
+            Map<String, Object> map = new HashMap<>();
+            for(Map.Entry<String, JsonElement> entry : item.entrySet()) {
+                if(entry.getKey().equals(INDEX)) {
+                    continue;
+                }
+                map.put(entry.getKey(), deserialize(entry.getValue()));
             }
+            ItemStack itemstack = (ItemStack) ConfigurationSerialization.deserializeObject(map);
+            inventory.setItem(item.get(INDEX).getAsInt(), itemstack);
         }
-        return null;
-    }
-
-    /**
-     * Deserializes an item meta using reflection
-     *
-     * @param data Serialized item meta
-     * @return deserialized item meta
-     */
-    public static ItemMeta getMeta(Map<String, Object> data) {
-        try {
-            return (ItemMeta) deserializeMeta.invoke(null, data);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not serialize data", e);
-        }
-        return null;
+        return inventory;
     }
 
     /**
      * Serializes vault
      *
-     * @param data map of slots and the items in the slot
+     * @param inventory Inventory to serialize
      * @return Serialized vault
      */
-    public static String serialize(Map<Integer, ItemStack> data) {
-        StringBuilder builder = new StringBuilder();
-        for (Map.Entry<Integer, ItemStack> entry : data.entrySet()) {
-            builder.append("[").append(entry.getKey()).append(";");
-            for (Map.Entry<String, Object> itemEntry : entry.getValue().serialize().entrySet()) {
-                serialize(builder, itemEntry.getKey(), itemEntry.getValue());
+    public static String serialize(Inventory inventory, String title) {
+        JsonObject json = new JsonObject();
+        json.addProperty("size", inventory.getSize());
+        json.addProperty("name", title);
+        JsonArray itemArray = new JsonArray();
+        for(int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+            if(item == null) {
+                continue;
             }
-            builder.append("]");
+            JsonObject itemObject = new JsonObject();
+            for(Map.Entry<String, Object> entry : item.serialize().entrySet()) {
+                itemObject.add(entry.getKey(), serialize(entry.getValue()));
+            }
+            itemObject.addProperty(INDEX, i);
+            itemArray.add(itemObject);
         }
-        return builder.toString();
+        json.add("items", itemArray);
+        return CompressionUtil.compress(json.toString());
     }
 
-    /**
-     * serialized key/value pair and adds it to given builder
-     *
-     * @param builder Where the key/value pair should be witten to
-     * @param key     The key
-     * @param value   The value
-     */
-    public static void serialize(StringBuilder builder, String key, Object value) {
-        builder.append(key).append("=");
-        for (SerializationLists lists : SerializationLists.values()) {
-            if (lists.getClazz().isAssignableFrom(value.getClass())) {
-                lists.serialize(builder, value);
-                builder.append(";");
-                return;
+    private static JsonElement serialize(Object value) {
+        if (value instanceof Object[]) {
+            JsonArray array = new JsonArray();
+            for(Object object : (Object[]) value) {
+                array.add(serialize(object));
             }
+            return array;
+        } else if (value instanceof Iterable<?>) {
+            JsonArray array = new JsonArray();
+            for(Object object : (Iterable<?>) value) {
+                array.add(serialize(object));
+            }
+            return array;
+        } else if (value instanceof ConfigurationSection) {
+            JsonObject object = new JsonObject();
+            for(Map.Entry<String, Object> entry : ((ConfigurationSection) value).getValues(false).entrySet()) {
+                object.add(entry.getKey(), serialize(entry.getValue()));
+            }
+            return object;
+        } else if (value instanceof ConfigurationSerializable) {
+            ConfigurationSerializable serializable = (ConfigurationSerializable) value;
+            Map<String, Object> values = new LinkedHashMap<>();
+            values.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
+            values.putAll(serializable.serialize());
+            JsonObject object = new JsonObject();
+            for(Map.Entry<String, Object> entry : values.entrySet()) {
+                object.add(entry.getKey(), serialize(entry.getValue()));
+            }
+            return object;
+        } else {
+            return new JsonPrimitive(value.toString());
+        }
+    }
+
+    private static Object deserialize(JsonElement element) {
+        if(element instanceof JsonObject) {
+            Map<String, Object> values = new HashMap<>();
+            for(Map.Entry<String, JsonElement> entry : ((JsonObject) element).entrySet()) {
+                values.put(entry.getKey(), deserialize(entry.getValue()));
+            }
+            return values;
+        } else if(element instanceof JsonArray) {
+            List<Object> list = new ArrayList<>();
+            for(JsonElement listElement : (JsonArray) element) {
+                list.add(deserialize(listElement));
+            }
+            return list;
+        } else if(element instanceof JsonPrimitive) {
+            JsonPrimitive primitive = (JsonPrimitive) element;
+            if(primitive.isNumber()) {
+                return primitive.getAsNumber();
+            } else if(primitive.isBoolean()) {
+                return primitive.getAsBoolean();
+            } else {
+                return primitive.getAsString();
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown JSON type: " + element.getClass());
         }
     }
 }

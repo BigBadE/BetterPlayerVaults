@@ -22,7 +22,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>software.bigbade.playervaults</groupId>
-    <artifactId>BetterPlayerVaults</artifactId>
+    <artifactId>better-player-vaults</artifactId>
     <version>1.0</version>
 
     <repositories>
@@ -96,17 +96,11 @@
             <version>3.3.3</version>
             <scope>test</scope>
         </dependency>
+        <!--Mocks bukkit stuff-->
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>2.0.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>2.0.6</version>
-            <scope>test</scope>
+            <groupId>com.github.seeseemelk</groupId>
+            <artifactId>MockBukkit-v1.15</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
         </dependency>
         <!--Annotation library-->
         <dependency>

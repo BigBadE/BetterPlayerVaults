@@ -1,9 +1,10 @@
 package software.bigbade.playervaults.loading;
 
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import software.bigbade.playervaults.BetterPlayerVaults;
@@ -11,9 +12,7 @@ import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.serialization.SerializationUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -23,11 +22,12 @@ public class PersistentVaultLoader implements IVaultLoader {
     private final BetterPlayerVaults vaults;
 
     @Override
-    public Map<Integer, ItemStack> getVault(Player player, int vault) {
+    public Inventory getVault(Player player, int vault) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         NamespacedKey key = getKey(vault);
-        if (!data.has(key, PersistentDataType.STRING))
-            return new HashMap<>();
+        if (!data.has(key, PersistentDataType.STRING)) {
+            return Bukkit.createInventory(null, 27, "Vault " + vault);
+        }
         String serialized = data.get(keys.get(vault), PersistentDataType.STRING);
         Objects.requireNonNull(serialized);
         return SerializationUtils.deserialize(serialized);
@@ -35,16 +35,8 @@ public class PersistentVaultLoader implements IVaultLoader {
 
     @Override
     public void saveVault(IPlayerVault vault) {
-        Map<Integer, ItemStack> saving = new HashMap<>();
-        for (int i = 0; i < vault.getInventory().getSize(); i++) {
-            ItemStack found = vault.getInventory().getItem(i);
-            if (found != null) {
-                saving.put(i, found);
-            }
-        }
         PersistentDataContainer data = vault.getPlayer().getPersistentDataContainer();
-        String serialized = SerializationUtils.serialize(saving);
-        data.set(getKey(vault.getNumber()), PersistentDataType.STRING, serialized);
+        data.set(getKey(vault.getNumber()), PersistentDataType.STRING, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
     }
 
     @Override
