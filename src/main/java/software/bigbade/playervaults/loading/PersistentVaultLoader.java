@@ -3,6 +3,7 @@ package software.bigbade.playervaults.loading;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -34,6 +35,11 @@ public class PersistentVaultLoader implements IVaultLoader {
     }
 
     @Override
+    public Inventory getVault(OfflinePlayer player, int vault) {
+        throw new UnsupportedOperationException("Cannot open offline player vaults with PersistentData due to Spigot limitations");
+    }
+
+    @Override
     public void saveVault(IPlayerVault vault) {
         PersistentDataContainer data = Objects.requireNonNull(Bukkit.getPlayer(vault.getOwner())).getPersistentDataContainer();
         data.set(getKey(vault.getNumber()), PersistentDataType.BYTE_ARRAY, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
@@ -42,6 +48,11 @@ public class PersistentVaultLoader implements IVaultLoader {
     @Override
     public String getName() {
         return "persistent";
+    }
+
+    @Override
+    public boolean worksOffline() {
+        return false;
     }
 
     private NamespacedKey getKey(int slot) {

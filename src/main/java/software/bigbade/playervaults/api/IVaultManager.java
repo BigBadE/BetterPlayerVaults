@@ -1,5 +1,6 @@
 package software.bigbade.playervaults.api;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -9,6 +10,8 @@ public interface IVaultManager {
 
     void openVault(Player player, int vaultNumber);
 
+    void openVault(OfflinePlayer player, Player opener, int vaultNumber);
+
     IPlayerVault getVault(Player player);
 
     List<IPlayerVault> getVaults();
@@ -16,4 +19,6 @@ public interface IVaultManager {
     void closeVault(IPlayerVault vault);
 
     void clearVaults();
+
+    boolean worksOffline();
 }

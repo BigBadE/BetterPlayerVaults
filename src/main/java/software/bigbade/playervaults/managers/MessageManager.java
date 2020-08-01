@@ -47,9 +47,11 @@ public class MessageManager {
 
     public void loadMessages(File dataFolder) {
         File translationFolder = new File(dataFolder, "translations");
-        if(!translationFolder.exists()) {
+        if(!translationFolder.exists() || translationFolder.listFiles() == null) {
+            FileUtils.createDirectory(translationFolder);
             MessageManager.downloadTranslations(translationFolder);
         }
+
         for(File file : translationFolder.listFiles()) {
             if(!file.getName().endsWith(".yml")) {
                 continue;

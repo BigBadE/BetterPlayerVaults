@@ -1,6 +1,7 @@
 package software.bigbade.playervaults.loading;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import software.bigbade.playervaults.api.IPlayerVault;
@@ -21,6 +22,11 @@ public class FlatfileVaultLoader implements IVaultLoader {
 
     @Override
     public Inventory getVault(Player player, int vault) {
+        return getVault(player, vault);
+    }
+
+    @Override
+    public Inventory getVault(OfflinePlayer player, int vault) {
         File dataFile = new File(dataFolder, player.getUniqueId().toString());
         if (!dataFile.exists()) {
             return Bukkit.createInventory(null, 27, "Vault " + vault);
@@ -38,5 +44,10 @@ public class FlatfileVaultLoader implements IVaultLoader {
     @Override
     public String getName() {
         return "flatfile";
+    }
+
+    @Override
+    public boolean worksOffline() {
+        return true;
     }
 }
