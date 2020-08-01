@@ -15,6 +15,7 @@ import software.bigbade.playervaults.listener.VaultCloseListener;
 import software.bigbade.playervaults.loading.IVaultLoader;
 import software.bigbade.playervaults.loading.LibraryLoader;
 import software.bigbade.playervaults.managers.LoaderManager;
+import software.bigbade.playervaults.managers.MessageManager;
 import software.bigbade.playervaults.managers.MetricsManager;
 
 import java.io.File;
@@ -51,6 +52,10 @@ public class BetterPlayerVaults extends JavaPlugin {
         setPluginLogger(getLogger());
 
         configuration = getConfig();
+
+        MessageManager messageManager = new MessageManager();
+        messageManager.loadMessages(getDataFolder());
+        messageManager.setMainLanguage(configuration.getString("language", "english"));
         loadVaultLoader();
 
         if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {
@@ -87,7 +92,7 @@ public class BetterPlayerVaults extends JavaPlugin {
             if (name.equals("mysql")) {
                 return new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.19/mysql-connector-java-8.0.19.jar");
             } else {
-                return new URL("https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.0.2/mongodb-driver-sync-4.0.2.jar");
+                return new URL("https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.0.2/mongodb-driver-sync-4.0.3.jar");
             }
         } catch (MalformedURLException e) {
             getPluginLogger().log(Level.SEVERE, "It seems the maven repo for the driver was deleted");
