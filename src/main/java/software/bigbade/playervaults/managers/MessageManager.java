@@ -43,6 +43,9 @@ public class MessageManager {
                 return;
             }
         }
+        if(current == null) {
+            current = messageBundles.get(0);
+        }
     }
 
     public void loadMessages(File dataFolder) {
@@ -58,7 +61,11 @@ public class MessageManager {
             }
             YamlConfiguration yamlConfiguration = FileUtils.loadYamlFile(file);
             MessageBundle bundle = new MessageBundle(file.getName().substring(0, file.getName().length()-4));
-            for(String key : yamlConfiguration.getKeys(false)) {
+            if(!yamlConfiguration.contains("messages")) {
+                BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Invalid translation file: {0}", file.getAbsolutePath());
+                return;
+            }
+            for(String key : yamlConfiguration.getConfigurationSection("messages").getKeys(false)) {
                 bundle.addMessage(key, yamlConfiguration.getString(key));
             }
             messageBundles.add(bundle);
@@ -66,6 +73,7 @@ public class MessageManager {
     }
 
     private static void downloadTranslations(File translationFolder) {
+        BetterPlayerVaults.getPluginLogger().log(Level.INFO, "Downloading translations from {0}", TRANSLATION_URL);
         List<String> languages = MessageManager.getLanguages();
         for(String language : languages) {
             URL ymlURL = FileUtils.getURL(TRANSLATION_URL + language.toLowerCase() + ".yml");

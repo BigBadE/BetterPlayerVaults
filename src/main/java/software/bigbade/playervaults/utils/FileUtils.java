@@ -59,6 +59,7 @@ public final class FileUtils {
             byte[] buffer = new byte[4096];
             int read;
             while ((read = stream.read(buffer)) != -1) {
+                System.out.println("Read " + read + " bytes");
                 fileOutputStream.write(buffer, 0, read);
             }
         } catch (IOException e) {

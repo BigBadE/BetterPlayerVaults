@@ -1,8 +1,10 @@
 package software.bigbade.playervaults.messages;
 
 import org.bukkit.ChatColor;
+import software.bigbade.playervaults.BetterPlayerVaults;
 import software.bigbade.playervaults.managers.MessageManager;
 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class StringMessage {
@@ -11,7 +13,13 @@ public class StringMessage {
     private final String message;
 
     public StringMessage(String key) {
-        message = ChatColor.translateAlternateColorCodes('&', MessageManager.getInstance().getMessage(key));
+        String foundMessage = MessageManager.getInstance().getMessage(key);
+        if(foundMessage == null) {
+            BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not find translation for key {0}", key);
+            message = key;
+        } else {
+            message = ChatColor.translateAlternateColorCodes('&', foundMessage);
+        }
     }
 
     public String translate(String... args) {
