@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.loading.IVaultLoader;
+import software.bigbade.playervaults.messages.StringMessage;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class VaultManager implements IVaultManager {
+    public static final StringMessage VAULT_TITLE = new StringMessage("title.vault");
+
     @Getter
     private final List<IPlayerVault> vaults = new ArrayList<>();
 
@@ -36,7 +39,7 @@ public class VaultManager implements IVaultManager {
 
     @Override
     public void openVault(OfflinePlayer player, Player opener, int vaultNumber) {
-        Inventory inventory = vaultLoader.getVault(player, vaultNumber);
+        Inventory inventory = vaultLoader.getVault(player, vaultNumber, 54);
         IPlayerVault vault = new PlayerVault(opener.getUniqueId(), inventory, vaultNumber);
         vaults.add(vault);
         opener.openInventory(inventory);

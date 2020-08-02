@@ -12,7 +12,7 @@ public class MySQLVaultLoader implements IVaultLoader {
     }
 
     @Override
-    public Inventory getVault(OfflinePlayer player, int vault) {
+    public Inventory getVault(OfflinePlayer player, int vault, int size) {
         //TODO
         return null;
     }

@@ -8,7 +8,7 @@ import software.bigbade.playervaults.api.IPlayerVault;
 public interface IVaultLoader {
     Inventory getVault(Player player, int vault);
 
-    Inventory getVault(OfflinePlayer player, int vault);
+    Inventory getVault(OfflinePlayer player, int vault, int size);
 
     void saveVault(IPlayerVault vault);
 

@@ -22,10 +22,10 @@ public class StringMessage {
         }
     }
 
-    public String translate(String... args) {
+    public String translate(Object... args) {
         String translation = message;
-        for(String arg : args) {
-            translation = ARG_PATTERN.matcher(translation).replaceFirst(arg);
+        for(Object arg : args) {
+            translation = ARG_PATTERN.matcher(translation).replaceFirst(arg.toString());
         }
         return translation;
     }

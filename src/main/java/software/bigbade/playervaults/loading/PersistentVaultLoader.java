@@ -10,7 +10,9 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import software.bigbade.playervaults.BetterPlayerVaults;
 import software.bigbade.playervaults.api.IPlayerVault;
+import software.bigbade.playervaults.impl.VaultManager;
 import software.bigbade.playervaults.serialization.SerializationUtils;
+import software.bigbade.playervaults.utils.VaultSizeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,22 +29,22 @@ public class PersistentVaultLoader implements IVaultLoader {
         PersistentDataContainer data = player.getPersistentDataContainer();
         NamespacedKey key = getKey(vault);
         if (!data.has(key, PersistentDataType.BYTE_ARRAY)) {
-            return Bukkit.createInventory(null, 27, "Vault " + vault);
+            return Bukkit.createInventory(null, VaultSizeUtil.getSize(player), VaultManager.VAULT_TITLE.translate(vault));
         }
         byte[] serialized = data.get(keys.get(vault), PersistentDataType.BYTE_ARRAY);
         Objects.requireNonNull(serialized);
-        return SerializationUtils.deserialize(serialized);
+        return SerializationUtils.deserialize(serialized, VaultSizeUtil.getSize(player));
     }
 
     @Override
-    public Inventory getVault(OfflinePlayer player, int vault) {
+    public Inventory getVault(OfflinePlayer player, int vault, int size) {
         throw new UnsupportedOperationException("Cannot open offline player vaults with PersistentData due to Spigot limitations");
     }
 
     @Override
     public void saveVault(IPlayerVault vault) {
         PersistentDataContainer data = Objects.requireNonNull(Bukkit.getPlayer(vault.getOwner())).getPersistentDataContainer();
-        data.set(getKey(vault.getNumber()), PersistentDataType.BYTE_ARRAY, SerializationUtils.serialize(vault.getInventory(), "Vault " + vault.getNumber()));
+        data.set(getKey(vault.getNumber()), PersistentDataType.BYTE_ARRAY, SerializationUtils.serialize(vault.getInventory(), VaultManager.VAULT_TITLE.translate(vault.getNumber())));
     }
 
     @Override
@@ -56,7 +58,7 @@ public class PersistentVaultLoader implements IVaultLoader {
     }
 
     private NamespacedKey getKey(int slot) {
-        if (keys.size() < slot) {
+        if (keys.size() <= slot) {
             for (int i = keys.size(); i <= slot; i++) {
                 keys.add(new NamespacedKey(vaults, "vault" + i));
             }

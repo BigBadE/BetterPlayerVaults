@@ -28,27 +28,33 @@ public final class SerializationUtils {
      * Deserializes given data
      *
      * @param data Serialized data
+     * @param size Inventory size
      * @return Deserialized inventory
      */
-    public static Inventory deserialize(@Nonnull String data) {
-        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject());
+    public static Inventory deserialize(@Nonnull String data, int size) {
+        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject(), size);
     }
 
     /**
      * Deserializes given data
      *
      * @param data Serialized data
+     * @param size Inventory size
      * @return Deserialized inventory
      */
-    public static Inventory deserialize(byte[] data) {
-        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject());
+    public static Inventory deserialize(byte[] data, int size) {
+        return deserialize(new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject(), size);
     }
 
-    private static Inventory deserialize(JsonObject json) {
-        int size = json.get("size").getAsInt();
+    private static Inventory deserialize(JsonObject json, int size) {
         String title = "";
         if(json.has("name")) {
             title = json.get("name").getAsString();
+        }
+        size = Math.min(Math.max(9, size), 54);
+        if(size%9!=0) {
+            //Round size to the nearest multiple of 9 using integer division
+            size = 9*size/9;
         }
         Inventory inventory = Bukkit.createInventory(null, size, title);
 
@@ -75,7 +81,6 @@ public final class SerializationUtils {
      */
     public static byte[] serialize(Inventory inventory, String title) {
         JsonObject json = new JsonObject();
-        json.addProperty("size", inventory.getSize());
         json.addProperty("name", title);
         JsonArray itemArray = new JsonArray();
         for(int i = 0; i < inventory.getSize(); i++) {

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class MessageManager {
@@ -44,7 +45,12 @@ public class MessageManager {
             }
         }
         if(current == null) {
-            current = messageBundles.get(0);
+            if(messageBundles.isEmpty()) {
+                BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "No valid translation files found!");
+                current = new MessageBundle("english");
+            } else {
+                current = messageBundles.get(0);
+            }
         }
     }
 
@@ -61,12 +67,11 @@ public class MessageManager {
             }
             YamlConfiguration yamlConfiguration = FileUtils.loadYamlFile(file);
             MessageBundle bundle = new MessageBundle(file.getName().substring(0, file.getName().length()-4));
-            if(!yamlConfiguration.contains("messages")) {
-                BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Invalid translation file: {0}", file.getAbsolutePath());
-                return;
-            }
-            for(String key : yamlConfiguration.getConfigurationSection("messages").getKeys(false)) {
-                bundle.addMessage(key, yamlConfiguration.getString(key));
+            for(String key : yamlConfiguration.getKeys(true)) {
+                String value = yamlConfiguration.getString(key);
+                if(value != null) {
+                    bundle.addMessage(key, yamlConfiguration.getString(key));
+                }
             }
             messageBundles.add(bundle);
         }

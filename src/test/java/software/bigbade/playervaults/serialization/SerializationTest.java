@@ -1,7 +1,6 @@
 package software.bigbade.playervaults.serialization;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -13,18 +12,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import software.bigbade.playervaults.BetterPlayerVaults;
 
 import java.util.Objects;
 
 public class SerializationTest {
-    private ServerMock server;
-    private BetterPlayerVaults plugin;
-
     @Before
     public void setUp() {
-        server = MockBukkit.mock();
-        plugin = MockBukkit.load(BetterPlayerVaults.class);
+        MockBukkit.mock();
     }
 
     @After
@@ -37,7 +31,7 @@ public class SerializationTest {
         Inventory inventory = Bukkit.createInventory(null, 27, "TestInv");
         inventory.setItem(0, new ItemBuilder(Material.LEATHER_BOOTS).setColor(DyeColor.BLUE).build());
         inventory.setItem(1, new ItemBuilder(Material.DIAMOND_SWORD).setDamage(123).build());
-        Assert.assertEquals(inventory, SerializationUtils.deserialize(SerializationUtils.serialize(inventory, "TestInv")));
+        Assert.assertEquals(inventory, SerializationUtils.deserialize(SerializationUtils.serialize(inventory, "TestInv"), 27));
     }
 }
 

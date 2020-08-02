@@ -4,7 +4,9 @@ import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import software.bigbade.playervaults.api.IPlayerVault;
@@ -73,7 +75,7 @@ public class BetterPlayerVaults extends JavaPlugin {
     }
 
     private void loadVaultLoader() {
-        String loader = configuration.getString("saveType", (version >= 14) ? "persistent" : "flatfile");
+        String loader = configuration.getString("save-type", (version >= 14) ? "persistent" : "flatfile");
         Objects.requireNonNull(loader);
         LoaderManager loaderManager = new LoaderManager(this);
         if (!loaderManager.checkName(loader, version)) {
@@ -81,7 +83,7 @@ public class BetterPlayerVaults extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
         } else {
             if (loader.equals("mysql") || loader.equals("mongodb")) {
-                Bukkit.getScheduler().runTaskAsynchronously(this, () -> new LibraryLoader(getDataFolder().getAbsolutePath()).loadLibrary(loader, getDownload(loader)));
+                Bukkit.getScheduler().runTaskAsynchronously(this, () -> new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig()).loadLibrary(loader, getDownload(loader)));
             }
             vaultLoader = loaderManager.getVaultLoader(loader);
         }
