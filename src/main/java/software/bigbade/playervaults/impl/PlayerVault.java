@@ -16,19 +16,10 @@ public class PlayerVault implements IPlayerVault {
     @Getter
     private final int number;
 
-    @Override
-    public boolean equals(Object obj) {
-        if(obj == null) {
-            return false;
-        }
-        if (IPlayerVault.class.isAssignableFrom(obj.getClass())) {
-            return ((IPlayerVault) obj).getOwner().equals(getOwner());
-        }
-        return false;
-    }
+    private boolean opened = true;
 
     @Override
-    public int hashCode() {
-        return getOwner().hashCode();
+    public void toggleClosed() {
+        opened = !opened;
     }
 }

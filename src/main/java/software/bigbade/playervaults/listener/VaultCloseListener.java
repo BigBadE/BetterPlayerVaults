@@ -5,7 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import software.bigbade.playervaults.api.IPlayerVault;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import software.bigbade.playervaults.api.IVaultManager;
 
 @RequiredArgsConstructor
@@ -14,9 +16,22 @@ public class VaultCloseListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        IPlayerVault vault = vaultManager.getVault((Player) event.getPlayer());
-        if (vault != null) {
-            vaultManager.closeVault(vault);
+        if(event.getInventory().getType() == InventoryType.CHEST) {
+            vaultManager.getVault(event.getPlayer().getUniqueId()).ifPresent(vault -> vaultManager.closeVault(event.getPlayer().getUniqueId(), vault));
         }
+    }
+
+    @EventHandler
+    public void onPlayerKicked(PlayerKickEvent event) {
+        removePlayerVault(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        removePlayerVault(event.getPlayer());
+    }
+
+    private void removePlayerVault(Player player) {
+        vaultManager.removeVault(player.getUniqueId());
     }
 }

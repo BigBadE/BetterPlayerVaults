@@ -18,11 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class MessageManager {
-    private static final String TRANSLATION_URL = "https://raw.githubusercontent.com/BigBadE/BPVTranslations/master/";
+    private static final String TRANSLATION_URL = "https://gitcdn.link/repo/BigBadE/BPVTranslations/master/";
 
     private final List<MessageBundle> messageBundles = new ArrayList<>();
     @Getter

@@ -11,7 +11,13 @@ public final class VaultSizeUtil {
     private VaultSizeUtil() {}
 
     public static int getSize(Player player) {
-        return VaultSizeUtil.getPermissionInteger(player, "betterplayervaults.vaults.size.", 27);
+        int size = VaultSizeUtil.getPermissionInteger(player, "betterplayervaults.vaults.size.", 27);
+        size = Math.min(Math.max(9, size), 54);
+        if (size % 9 != 0) {
+            //Round size to the nearest multiple of 9 using integer division
+            size = 9 * size / 9;
+        }
+        return size;
     }
 
     public static int getVaults(Player player) {

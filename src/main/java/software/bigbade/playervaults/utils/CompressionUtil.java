@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -30,11 +31,12 @@ public final class CompressionUtil {
 
         outputStream.close();
 
-        return outputStream.toByteArray();
+        System.out.println("Serialized: " + Base64.getEncoder().encodeToString(outputStream.toByteArray()));
+        return Base64.getEncoder().encode(outputStream.toByteArray());
     }
 
     public static String decompress(String inputStr) {
-        return decompress(inputStr.getBytes(StandardCharsets.ISO_8859_1));
+        return decompress(inputStr.getBytes(StandardCharsets.UTF_8));
     }
 
     @SneakyThrows
@@ -42,7 +44,7 @@ public final class CompressionUtil {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
         byte[] buffer = new byte[1024];
 
-        DECOMPRESSER.setInput(data);
+        DECOMPRESSER.setInput(Base64.getDecoder().decode(data));
         while (!DECOMPRESSER.finished()) {
             int count = DECOMPRESSER.inflate(buffer);
             if(count == 0) {
@@ -54,6 +56,6 @@ public final class CompressionUtil {
 
         outputStream.close();
 
-        return new String(outputStream.toByteArray(), StandardCharsets.ISO_8859_1);
+        return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
     }
 }

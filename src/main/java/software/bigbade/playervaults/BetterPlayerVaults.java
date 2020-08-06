@@ -4,15 +4,12 @@ import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
-import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.command.VaultCommand;
-import software.bigbade.playervaults.impl.VaultManager;
+import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.listener.VaultCloseListener;
 import software.bigbade.playervaults.loading.IVaultLoader;
 import software.bigbade.playervaults.loading.LibraryLoader;
@@ -55,23 +52,28 @@ public class BetterPlayerVaults extends JavaPlugin {
 
         configuration = getConfig();
 
-        MessageManager messageManager = new MessageManager();
-        messageManager.loadMessages(getDataFolder());
-        messageManager.setMainLanguage(configuration.getString("language", "english"));
         loadVaultLoader();
+
+        if (vaultLoader == null) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        MessageManager messageManager = new MessageManager();
+
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            messageManager.loadMessages(getDataFolder());
+            messageManager.setMainLanguage(configuration.getString("language", "english"));
+
+            vaultManager = new VaultManager(vaultLoader);
+
+            Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultManager), this);
+            Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultManager));
+        });
 
         if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {
             new MetricsManager(this);
         }
-
-        if (vaultLoader == null) {
-            return;
-        }
-
-        vaultManager = new VaultManager(vaultLoader);
-
-        Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultManager), this);
-        Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultManager));
     }
 
     private void loadVaultLoader() {
@@ -106,9 +108,6 @@ public class BetterPlayerVaults extends JavaPlugin {
     public void onDisable() {
         if (vaultManager == null) {
             return;
-        }
-        for (IPlayerVault vault : vaultManager.getVaults()) {
-            vaultManager.closeVault(vault);
         }
         vaultManager.clearVaults();
     }

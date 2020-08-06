@@ -19,13 +19,13 @@ public class VaultCommand implements CommandExecutor {
     public static final StringMessage OPEN_OTHER_VAULT_MESSAGE = new StringMessage("command.vault.open-other-vault");
     public static final StringMessage NOT_ENOUGH_VAULTS_MESSAGE = new StringMessage("command.vault.not-enough");
     public static final StringMessage OTHER_NOT_ENOUGH_VAULTS_MESSAGE = new StringMessage("command.vault.other-not-enough");
-    public static final String NO_PERMISSION_MESSAGE = new StringMessage("command.permission").translate();
-    public static final String NOT_A_PLAYER_MESSAGE = new StringMessage("command.player-not-found").translate();
-    public static final String TOO_MANY_ARGS_MESSAGE = new StringMessage("command.too-many-args").translate();
     public static final String PLAYER_NOT_FOUND_MESSAGE = new StringMessage("command.player-not-found").translate();
     public static final String OFFLINE_PLAYER_MESSAGE = new StringMessage("command.offline-player").translate();
-    public static final String OPEN_VAULT_MESSAGE = new StringMessage("command.vault.open").translate();
+    public static final String NOT_A_PLAYER_MESSAGE = new StringMessage("command.player-not-found").translate();
+    public static final String TOO_MANY_ARGS_MESSAGE = new StringMessage("command.too-many-args").translate();
     public static final String COMMAND_USAGE_MESSAGE = new StringMessage("command.vault.usage").translate();
+    public static final String NO_PERMISSION_MESSAGE = new StringMessage("command.permission").translate();
+    public static final String OPEN_VAULT_MESSAGE = new StringMessage("command.vault.open").translate();
     private final IVaultManager vaultManager;
 
     //TODO reduce cognitive complexity
@@ -51,7 +51,7 @@ public class VaultCommand implements CommandExecutor {
                     if(!offlinePlayer.hasPlayedBefore()) {
                         player.sendMessage(PLAYER_NOT_FOUND_MESSAGE);
                     } else {
-                        vaultManager.openVault(offlinePlayer, player, vaultId);
+                        vaultManager.openVault(offlinePlayer.getUniqueId(), player, vaultId);
                         player.sendMessage(OPEN_OTHER_VAULT_MESSAGE.translate(offlinePlayer.getName()));
                     }
                 } else {
@@ -67,7 +67,7 @@ public class VaultCommand implements CommandExecutor {
                 player.sendMessage(OTHER_NOT_ENOUGH_VAULTS_MESSAGE.translate(target.getName(), vaults));
                 return true;
             }
-            vaultManager.openVault(target, player, vaultId);
+            vaultManager.openVault(target.getUniqueId(), player, vaultId);
             player.sendMessage(OPEN_OTHER_VAULT_MESSAGE.translate(target.getName()));
             return true;
         } else if(args.length == 1) {
@@ -94,7 +94,7 @@ public class VaultCommand implements CommandExecutor {
         return true;
     }
 
-    private static int getVaultFromString(String number, Player player) {
+    public static int getVaultFromString(String number, CommandSender player) {
         try {
             return Integer.parseInt(number);
         } catch (NumberFormatException e) {

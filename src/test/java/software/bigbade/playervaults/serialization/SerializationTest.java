@@ -31,7 +31,7 @@ public class SerializationTest {
         Inventory inventory = Bukkit.createInventory(null, 27, "TestInv");
         inventory.setItem(0, new ItemBuilder(Material.LEATHER_BOOTS).setColor(DyeColor.BLUE).build());
         inventory.setItem(1, new ItemBuilder(Material.DIAMOND_SWORD).setDamage(123).build());
-        Assert.assertEquals(inventory, SerializationUtils.deserialize(SerializationUtils.serialize(inventory, "TestInv"), 27));
+        Assert.assertEquals(inventory, SerializationUtils.deserialize(SerializationUtils.serialize(inventory), "TestInv", 27));
     }
 }
 
