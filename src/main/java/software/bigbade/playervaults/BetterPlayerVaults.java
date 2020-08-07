@@ -8,6 +8,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import software.bigbade.playervaults.api.IVaultManager;
+import software.bigbade.playervaults.command.ClearCommand;
 import software.bigbade.playervaults.command.VaultCommand;
 import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.listener.VaultCloseListener;
@@ -69,6 +70,7 @@ public class BetterPlayerVaults extends JavaPlugin {
 
             Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultManager), this);
             Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultManager));
+            Objects.requireNonNull(getCommand("clearvault")).setExecutor(new ClearCommand(vaultManager));
         });
 
         if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {

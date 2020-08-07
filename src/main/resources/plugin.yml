@@ -1,5 +1,5 @@
 name: BetterPlayerVaults
-version: 1.0
+version: "1.0"
 main: software.bigbade.playervaults.BetterPlayerVaults
 commands:
   playervault:
@@ -8,3 +8,19 @@ commands:
     aliases:
       - pv
       - vault
+  clearvault:
+    description: Clears a player's vault
+    usage: /clearvault (player) (number)
+    aliases:
+      - clearvault
+      - deletevault
+permissions:
+  betterplayervaults.open:
+    description: Allows the player to open vaults
+    default: true
+  betterplayervaults.snoop:
+    description: Allows the player to snoop in vaults
+    default: false
+  betterplayervaults.clear:
+    description: Allows the player to clear vaults
+    default: false
