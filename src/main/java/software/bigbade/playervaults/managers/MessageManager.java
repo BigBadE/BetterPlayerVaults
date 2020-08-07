@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -58,6 +59,18 @@ public class MessageManager {
         if(!translationFolder.exists() || translationFolder.listFiles() == null) {
             FileUtils.createDirectory(translationFolder);
             MessageManager.downloadTranslations(translationFolder);
+        } else {
+            File versionFile = new File(translationFolder, "version.yml");
+            if(!versionFile.exists()) {
+                MessageManager.downloadTranslations(translationFolder);
+            } else {
+                byte[] version = FileUtils.read(versionFile);
+                URL ymlURL = FileUtils.getURL(TRANSLATION_URL + "version.yml");
+                FileUtils.copyURLToFile(ymlURL, versionFile);
+                if (!Arrays.equals(version, FileUtils.read(versionFile))) {
+                    MessageManager.downloadTranslations(translationFolder);
+                }
+            }
         }
 
         for(File file : translationFolder.listFiles()) {

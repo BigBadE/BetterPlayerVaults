@@ -55,7 +55,7 @@ public final class FileUtils {
 
     public static void copyURLToFile(URL url, File file) {
         try(InputStream stream = url.openStream();
-            FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+            FileOutputStream fileOutputStream = new FileOutputStream(file, false)) {
             byte[] buffer = new byte[1024];
             int read;
             while ((read = stream.read(buffer)) != -1) {
