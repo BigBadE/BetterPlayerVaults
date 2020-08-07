@@ -25,7 +25,7 @@ public class ClearCommand extends BasicCommand<CommandSender> {
                     player.sendMessage(VAULT_CLEARED_MESSAGE);
                 });
             } else {
-                player.sendMessage(VaultCommand.NOT_A_PLAYER_MESSAGE);
+                player.sendMessage(NOT_A_PLAYER_MESSAGE);
             }
         } else if(args.length == 2) {
             Optional<Integer> vaultOptional = parseInt(args[1], player);
@@ -37,7 +37,7 @@ public class ClearCommand extends BasicCommand<CommandSender> {
                 player.sendMessage(VAULT_CLEARED_MESSAGE);
             }));
         } else {
-            player.sendMessage(VaultCommand.TOO_MANY_ARGS_MESSAGE);
+            player.sendMessage(TOO_MANY_ARGS_MESSAGE);
             player.sendMessage(COMMAND_USAGE_MESSAGE);
         }
     }

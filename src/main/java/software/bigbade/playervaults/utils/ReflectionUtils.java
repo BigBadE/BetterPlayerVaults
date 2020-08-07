@@ -25,8 +25,9 @@ public final class ReflectionUtils {
 
     public static Method getMethod(Class<?> clazz, String name) {
         for (Method method : clazz.getMethods()) {
-            if (method.getName().equals(name))
+            if (method.getName().equals(name)) {
                 return method;
+            }
         }
         return null;
     }

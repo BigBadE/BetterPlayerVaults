@@ -21,7 +21,6 @@ public class VaultCommand extends BasicCommand<Player> {
         super("betterplayervaults.open", vaultManager);
     }
 
-    //TODO reduce cognitive complexity
     @Override
     public void onCommand(Player player, @Nonnull String[] args) {
         Optional<Integer> vaultId = Optional.empty();

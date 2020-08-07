@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class MessageManager {
-    private static final String TRANSLATION_URL = "https://gitcdn.link/repo/BigBadE/BPVTranslations/master/";
+    private static final String TRANSLATION_URL = "https://gitcdn.link/repo/BigBadE/BPVTranslations/release/";
+    private static final String VERSION_YML = "version.yml";
 
     private final List<MessageBundle> messageBundles = new ArrayList<>();
     @Getter
@@ -60,17 +61,7 @@ public class MessageManager {
             FileUtils.createDirectory(translationFolder);
             MessageManager.downloadTranslations(translationFolder);
         } else {
-            File versionFile = new File(translationFolder, "version.yml");
-            if(!versionFile.exists()) {
-                MessageManager.downloadTranslations(translationFolder);
-            } else {
-                byte[] version = FileUtils.read(versionFile);
-                URL ymlURL = FileUtils.getURL(TRANSLATION_URL + "version.yml");
-                FileUtils.copyURLToFile(ymlURL, versionFile);
-                if (!Arrays.equals(version, FileUtils.read(versionFile))) {
-                    MessageManager.downloadTranslations(translationFolder);
-                }
-            }
+            MessageManager.checkVersion(translationFolder);
         }
 
         for(File file : translationFolder.listFiles()) {
@@ -89,9 +80,25 @@ public class MessageManager {
         }
     }
 
+    private static void checkVersion(File translationFolder) {
+        File versionFile = new File(translationFolder, VERSION_YML);
+        if(!versionFile.exists()) {
+            MessageManager.downloadTranslations(translationFolder);
+        } else {
+            byte[] version = FileUtils.read(versionFile);
+            URL ymlURL = FileUtils.getURL(TRANSLATION_URL + VERSION_YML);
+            FileUtils.copyURLToFile(ymlURL, versionFile);
+            if (!Arrays.equals(version, FileUtils.read(versionFile))) {
+                MessageManager.downloadTranslations(translationFolder);
+            }
+        }
+    }
+
     private static void downloadTranslations(File translationFolder) {
         BetterPlayerVaults.getPluginLogger().log(Level.INFO, "Downloading translations from {0}", TRANSLATION_URL);
         List<String> languages = MessageManager.getLanguages();
+        URL versionURL = FileUtils.getURL(TRANSLATION_URL + VERSION_YML);
+        FileUtils.copyURLToFile(versionURL, new File(translationFolder, VERSION_YML));
         for(String language : languages) {
             URL ymlURL = FileUtils.getURL(TRANSLATION_URL + language.toLowerCase() + ".yml");
             FileUtils.copyURLToFile(ymlURL, new File(translationFolder, language.toLowerCase() + ".yml"));

@@ -6,8 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import software.bigbade.playervaults.utils.CompressionUtil;
 
 public final class SerializationUtils {
-    private static final String INDEX = "index";
-
     private SerializationUtils() { }
 
     /**
