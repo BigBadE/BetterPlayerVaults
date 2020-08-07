@@ -1,5 +1,14 @@
 # BetterPlayerVaults
-I felt PlayerVaults/PlayerVaultsX was scummy with it's monetisation system, so I decided to fix it myself.
+I felt PlayerVaults/PlayerVaultsX was scummy with its monetization, so I decided to fix it myself.
+
+## Requirements
+Lombok, 
+Maven
 
 ## Contributing
-Contributing is always welcome, the project requires Lombok.
+Contributing is always welcome.
+
+## Branches
+master: The main branch with the latest changes. PRs go here.
+
+release: Latest release on spigotmc.org.
