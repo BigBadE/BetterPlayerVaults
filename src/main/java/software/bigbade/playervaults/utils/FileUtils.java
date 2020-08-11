@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 public final class FileUtils {
@@ -54,8 +55,8 @@ public final class FileUtils {
     }
 
     public static void copyURLToFile(URL url, File file) {
-        try(InputStream stream = url.openStream();
-            FileOutputStream fileOutputStream = new FileOutputStream(file, false)) {
+        try (InputStream stream = url.openStream();
+             FileOutputStream fileOutputStream = new FileOutputStream(file, false)) {
             byte[] buffer = new byte[1024];
             int read;
             while ((read = stream.read(buffer)) != -1) {
@@ -64,6 +65,16 @@ public final class FileUtils {
         } catch (IOException e) {
             BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Error downloading file from {0}", url);
         }
+    }
+
+    public static boolean compareURLContents(URL url, byte[] content) {
+        try (InputStream stream = url.openStream()) {
+            byte[] buffer = new byte[content.length];
+            return stream.read(buffer) != content.length || stream.available() != 0 || !Arrays.equals(buffer, content);
+        } catch (IOException e) {
+            BetterPlayerVaults.getPluginLogger().log(Level.SEVERE, "Error downloading file from {0}", url);
+        }
+        return false;
     }
 
     public static YamlConfiguration loadYamlFile(File file) {

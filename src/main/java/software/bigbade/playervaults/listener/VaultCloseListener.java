@@ -17,7 +17,7 @@ public class VaultCloseListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if(event.getInventory().getType() == InventoryType.CHEST) {
-            vaultManager.getVault(event.getPlayer().getUniqueId()).ifPresent(vault -> vaultManager.closeVault(event.getPlayer().getUniqueId(), vault));
+            vaultManager.getVault(event.getPlayer().getUniqueId(), -1).ifPresent(vault -> vaultManager.closeVault(event.getPlayer().getUniqueId(), vault));
         }
     }
 

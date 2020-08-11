@@ -1,10 +1,11 @@
 package software.bigbade.playervaults.serialization;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -14,52 +15,16 @@ import software.bigbade.playervaults.utils.CompressionUtil;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JsonSerialization extends FileConfiguration {
     private static final String BLANK_CONFIG = "{}\n";
 
-    @Override
-    public @Nonnull String saveToString() {
-        String output = new String(CompressionUtil.compress(serialize(getValues(false)).toString()), StandardCharsets.UTF_8);
-
-        if (output.equals(BLANK_CONFIG)) {
-            output = "";
-        }
-        return output;
-    }
-
-    @Override
-    public void loadFromString(@Nonnull String data) {
-        if(data.isEmpty()) {
-            return;
-        }
-
-        Map<Object, Object> dataMap = new Gson().fromJson(CompressionUtil.decompress(data), Map.class);
-        System.out.println(printData(dataMap));
-        for(Map.Entry<Object, Object> entry : dataMap.entrySet()) {
-            set(entry.getKey().toString(), entry.getValue());
-        }
-    }
-
-    private String printData(Object object) {
-        if(object instanceof Map) {
-            StringBuilder builder = new StringBuilder();
-            ((Map<Object, Object>) object).forEach((key, value) -> builder.append(key.toString()).append(": ").append(printData(value)));
-            return builder.toString();
-        } else if(object instanceof Iterable) {
-            StringBuilder builder = new StringBuilder();
-            for(Object value : (Iterable<Object>) object) {
-                builder.append(value).append(",");
-            }
-            builder.substring(0, builder.length());
-            return builder.toString();
-        } else {
-            return object.toString();
-        }
-    }
-
+    @SuppressWarnings("unchecked")
     private static JsonElement serialize(Object value) {
         if (value instanceof Object[]) {
             JsonArray array = new JsonArray();
@@ -73,6 +38,12 @@ public class JsonSerialization extends FileConfiguration {
                 array.add(serialize(object));
             }
             return array;
+        } else if (value instanceof Map) {
+            JsonObject object = new JsonObject();
+            for(Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+                object.add(entry.getKey().toString(), serialize(entry.getValue()));
+            }
+            return object;
         } else if (value instanceof ConfigurationSection) {
             JsonObject object = new JsonObject();
             for (Map.Entry<String, Object> entry : ((ConfigurationSection) value).getValues(false).entrySet()) {
@@ -92,12 +63,84 @@ public class JsonSerialization extends FileConfiguration {
             }
             return object;
         } else {
+            if (value instanceof Number) {
+                for (NumberTypes types : NumberTypes.values()) {
+                    if (value.getClass().equals(types.getClazz())) {
+                        return new JsonPrimitive(value.toString() + types.getCharacter());
+                    }
+                }
+            }
             return new JsonPrimitive(value.toString());
         }
     }
 
     @Override
-    protected @Nonnull String buildHeader() {
+    public @Nonnull
+    String saveToString() {
+        String json = serialize(getValues(false)).toString();
+        String output = new String(CompressionUtil.compress(json), StandardCharsets.UTF_8);
+        if (output.equals(BLANK_CONFIG)) {
+            output = "";
+        }
+        return output;
+    }
+
+    @Override
+    public void loadFromString(@Nonnull String data) {
+        if (data.isEmpty()) {
+            return;
+        }
+
+        System.out.println(CompressionUtil.decompress(data));
+        JsonObject object = new JsonParser().parse(CompressionUtil.decompress(data)).getAsJsonObject();
+        loadData(object, this);
+    }
+
+    private void loadData(JsonObject object, ConfigurationSection section) {
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+            section.set(entry.getKey(), deserialize(entry.getValue()));
+        }
+    }
+
+    private Object deserialize(JsonElement element) {
+        if (element instanceof JsonObject) {
+            JsonObject object = (JsonObject) element;
+            Map<String, Object> map = new HashMap<>();
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                map.put(entry.getKey(), deserialize(entry.getValue()));
+            }
+            if(map.containsKey(ConfigurationSerialization.SERIALIZED_TYPE_KEY)) {
+                return ConfigurationSerialization.deserializeObject(map);
+            }
+            return map;
+        } else if (element instanceof JsonArray) {
+            List<Object> list = new ArrayList<>();
+            for (JsonElement listElement : ((JsonArray) element)) {
+                list.add(deserialize(listElement));
+            }
+            return list;
+        } else if (element instanceof JsonPrimitive) {
+            String value = element.getAsString();
+            if (value.isEmpty()) {
+                return "";
+            }
+            String number = value.substring(0, value.length() - 1);
+            if (StringUtils.isNumeric(number)) {
+                char character = value.charAt(value.length() - 1);
+                for (NumberTypes types : NumberTypes.values()) {
+                    if (types.getCharacter() == character) {
+                        return types.getConverter().apply(number);
+                    }
+                }
+            }
+            return value;
+        }
+        throw new IllegalStateException("JsonElement has bad class: " + element.getClass());
+    }
+
+    @Override
+    protected @Nonnull
+    String buildHeader() {
         return "";
     }
 }

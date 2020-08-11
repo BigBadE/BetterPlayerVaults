@@ -12,7 +12,13 @@ public interface IVaultManager {
 
     void openVault(UUID player, Player opener, int vaultNumber);
 
-    Optional<IPlayerVault> getVault(UUID player);
+    /**
+     * Gets the vault of the player
+     * @param player The player to get the vault of
+     * @param number Vault number, -1 for any
+     * @return Optional of vault
+     */
+    Optional<IPlayerVault> getVault(UUID player, int number);
 
     void closeVault(UUID player, IPlayerVault vault);
 

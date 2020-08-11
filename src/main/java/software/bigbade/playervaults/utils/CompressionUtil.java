@@ -31,12 +31,11 @@ public final class CompressionUtil {
 
         outputStream.close();
 
-        System.out.println("Serialized: " + Base64.getEncoder().encodeToString(outputStream.toByteArray()));
         return Base64.getEncoder().encode(outputStream.toByteArray());
     }
 
     public static String decompress(String inputStr) {
-        return decompress(inputStr.getBytes(StandardCharsets.UTF_8));
+        return decompress(inputStr.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     @SneakyThrows

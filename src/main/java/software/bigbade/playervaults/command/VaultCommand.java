@@ -23,7 +23,7 @@ public class VaultCommand extends BasicCommand<Player> {
 
     @Override
     public void onCommand(Player player, @Nonnull String[] args) {
-        Optional<Integer> vaultId = Optional.empty();
+        Optional<Integer> vaultId = Optional.of(1);
         if (args.length > 2 || args.length == 2 && !player.hasPermission(SNOOP_PERMISSION) && !player.isOp()) {
             player.sendMessage(TOO_MANY_ARGS_MESSAGE);
             player.sendMessage(player.isOp() || player.hasPermission(SNOOP_PERMISSION) ? COMMAND_OP_USAGE_MESSAGE : COMMAND_USAGE_MESSAGE);
@@ -46,12 +46,15 @@ public class VaultCommand extends BasicCommand<Player> {
         } else if (args.length == 1) {
             vaultId = parseInt(args[0], player);
         }
+        System.out.println("Checking vault");
         vaultId.ifPresent(vault -> {
+            System.out.println("Yep");
             int vaults = VaultSizeUtil.getVaults(player);
             if (vaults < vault) {
                 player.sendMessage(NOT_ENOUGH_VAULTS_MESSAGE.translate(vaults));
                 return;
             }
+            System.out.println("Opening");
             getVaultManager().openVault(player, vault);
             player.sendMessage(OPEN_VAULT_MESSAGE);
         });

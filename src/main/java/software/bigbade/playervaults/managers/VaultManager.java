@@ -27,12 +27,12 @@ public class VaultManager implements IVaultManager {
 
     @Override
     public boolean isInVault(UUID player) {
-        return getVault(player).isPresent();
+        return getVault(player, -1).isPresent();
     }
 
     @Override
-    public Optional<IPlayerVault> getVault(UUID player) {
-        return Optional.ofNullable(vaults.get(player));
+    public Optional<IPlayerVault> getVault(UUID player, int number) {
+        return Optional.ofNullable(vaults.get(player)).filter(vault -> number == -1 || vault.getNumber() == number);
     }
 
     @Override
@@ -45,9 +45,11 @@ public class VaultManager implements IVaultManager {
 
     @Override
     public void openVault(Player player, int vaultNumber) {
-        Optional<IPlayerVault> optionalVault = getVault(player.getUniqueId());
+        Optional<IPlayerVault> optionalVault = getVault(player.getUniqueId(), vaultNumber);
         if (optionalVault.isPresent()) {
-            optionalVault.get().toggleClosed();
+            IPlayerVault vault = optionalVault.get();
+            vault.toggleClosed();
+            player.openInventory(vault.getInventory());
         } else {
             Inventory inventory = vaultLoader.getVault(player, vaultNumber);
             IPlayerVault vault = new PlayerVault(player.getUniqueId(), inventory, vaultNumber);
