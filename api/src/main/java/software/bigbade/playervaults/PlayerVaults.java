@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class PlayerVaults extends JavaPlugin {
-    private static final URL VERSION_URL = FileUtils.getURL("https://gitcdn.link/repo/BigBadE/BetterPlayerVaults/release/version.yml");
+    private static final URL VERSION_URL = FileUtils.getURL("https://raw.githubusercontent.com/BigBadE/BetterPlayerVaults/release/version.yml");
     private static final String VERSION_YML = "version.yml";
     @Getter
     private static Logger pluginLogger;
@@ -52,16 +52,19 @@ public abstract class PlayerVaults extends JavaPlugin {
             FileUtils.copyURLToFile(VERSION_URL, versionFile);
             setVersion("INSTALL");
         } else {
-            setVersion(new String(FileUtils.read(versionFile), StandardCharsets.UTF_8));
+            byte[] data = FileUtils.read(versionFile);
+            setVersion(new String(data, 10, data.length-11, StandardCharsets.UTF_8));
         }
         assert VERSION_URL != null;
         try (InputStream stream = FileUtils.createStream(VERSION_URL)) {
             byte[] buffer = new byte[256];
             assert stream != null;
-            if(stream.read(buffer) == 0){
-                getLogger().log(Level.SEVERE, "Version file ({0}) had 0 bytes", VERSION_URL);
+            int read = stream.read(buffer);
+            String foundVersion = new String(buffer, 10, read-11, StandardCharsets.UTF_8);
+            if(foundVersion.equals("404: Not Found")) {
+                foundVersion = version;
             }
-            setLatestVersion(new String(buffer, StandardCharsets.UTF_8));
+            setLatestVersion(foundVersion);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -23,9 +23,9 @@ import software.bigbade.playervaults.managers.MetricsManager;
 import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.taskchain.ActionChain;
 import software.bigbade.playervaults.utils.CompressionUtil;
+import software.bigbade.playervaults.utils.FileUtils;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -56,12 +56,8 @@ public class BetterPlayerVaults extends PlayerVaults {
             name = "Mongo";
         }
         String link = "https://github.com/BigBadE/BetterPlayerVaults/releases/download/" + getLatestVersion() + "/BetterPlayerVaults-" + name + "-" + getLatestVersion() + ".jar";
-        try {
-            return new URL(link);
-        } catch (MalformedURLException e) {
-            getPluginLogger().log(Level.SEVERE, "It seems the maven repo for the driver was deleted");
-        }
-        return null;
+        System.out.println("Link: " + link);
+        return FileUtils.getURL(link);
     }
 
     @Override
