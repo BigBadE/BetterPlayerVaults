@@ -13,29 +13,34 @@ import software.bigbade.playervaults.taskchain.ActionChain;
 
 @RequiredArgsConstructor
 public class VaultCloseListener implements Listener {
-    private final IVaultManager vaultManager;
+  private final IVaultManager vaultManager;
 
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getType() == InventoryType.CHEST) {
-            new ActionChain().async(() ->
-                    vaultManager.getVault(event.getPlayer().getUniqueId(), -1)
-                            .ifPresent(vault -> vaultManager.closeVault(event.getPlayer().getUniqueId(), vault)))
-                    .execute();
-        }
+  @EventHandler
+  public void onInventoryClose(InventoryCloseEvent event) {
+    if (event.getInventory().getType() == InventoryType.CHEST) {
+      new ActionChain()
+          .async(
+              ()
+                  -> vaultManager.getVault(event.getPlayer().getUniqueId(), -1)
+                         .ifPresent(
+                             vault
+                             -> vaultManager.closeVault(
+                                 event.getPlayer().getUniqueId(), vault)))
+          .execute();
     }
+  }
 
-    @EventHandler
-    public void onPlayerKicked(PlayerKickEvent event) {
-        removePlayerVault(event.getPlayer());
-    }
+  @EventHandler
+  public void onPlayerKicked(PlayerKickEvent event) {
+    removePlayerVault(event.getPlayer());
+  }
 
-    @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent event) {
-        removePlayerVault(event.getPlayer());
-    }
+  @EventHandler
+  public void onPlayerLeave(PlayerQuitEvent event) {
+    removePlayerVault(event.getPlayer());
+  }
 
-    private void removePlayerVault(Player player) {
-        vaultManager.removeVault(player.getUniqueId());
-    }
+  private void removePlayerVault(Player player) {
+    vaultManager.removeVault(player.getUniqueId());
+  }
 }

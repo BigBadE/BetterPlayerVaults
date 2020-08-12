@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class DatabaseSettings {
-    private final String url;
-    private final String username;
-    private final String password;
-    private final String database;
-    private final String security;
-    private final String tableName;
+  private final String url;
+  private final String username;
+  private final String password;
+  private final String database;
+  private final String security;
+  private final String tableName;
 }
