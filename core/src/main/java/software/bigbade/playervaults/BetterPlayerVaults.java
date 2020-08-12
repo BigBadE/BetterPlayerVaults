@@ -12,6 +12,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import software.bigbade.playervaults.command.ClearCommand;
 import software.bigbade.playervaults.command.VaultCommand;
+import software.bigbade.playervaults.impl.TaskChainFactoryImpl;
 import software.bigbade.playervaults.listener.VaultCloseListener;
 import software.bigbade.playervaults.api.IVaultLoader;
 import software.bigbade.playervaults.loading.LibraryLoader;
@@ -30,7 +31,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 public class BetterPlayerVaults extends PlayerVaults {
-    private final int version = Integer.parseInt(Bukkit.getVersion().split("\\.")[1]);
+    private static final int MC_VERSION = Integer.parseInt(Bukkit.getVersion().split("\\.")[1]);
 
     private TaskChainFactory taskChainFactory;
     private FileConfiguration configuration;
@@ -58,6 +59,8 @@ public class BetterPlayerVaults extends PlayerVaults {
 
         taskChainFactory = BukkitTaskChainFactory.create(this);
 
+        new TaskChainFactoryImpl(this);
+
         loadVaultLoader();
 
         if (!isEnabled()) {
@@ -81,18 +84,18 @@ public class BetterPlayerVaults extends PlayerVaults {
 
 
     private void loadVaultLoader() {
-        String loader = Objects.requireNonNull(configuration.getString("save-type", (version >= 14) ? "persistent" : "flatfile")).toLowerCase();
+        String loader = Objects.requireNonNull(configuration.getString("save-type", (MC_VERSION >= 14) ? "persistent" : "flatfile")).toLowerCase();
         Objects.requireNonNull(loader);
         LoaderFactory loaderFactory = new LoaderFactory(this);
         CompressionUtil.setCompressionLevel(getConfig().getInt("compression-level", 3));
-        if (!loaderFactory.checkName(loader, version)) {
+        if (!loaderFactory.checkName(loader, MC_VERSION)) {
             getPluginLogger().log(Level.SEVERE, "Invalid saveType set! Options are: flatfile, persistent (1.14+), mysql, mongodb");
             Bukkit.getPluginManager().disablePlugin(this);
         } else {
             if (loader.equals("mysql") || loader.equals("mongo")) {
                 new ActionChain().async(() -> {
                     LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig());
-                    libraryLoader.loadLibrary(loader, getDownload(loader));
+                    libraryLoader.loadLibrary(loader, BetterPlayerVaults.getDownload(loader));
                     ConfigurationSection section = configuration.getConfigurationSection("database");
                     if(section == null) {
                         section = configuration.createSection("database");
@@ -125,7 +128,7 @@ public class BetterPlayerVaults extends PlayerVaults {
         Objects.requireNonNull(getCommand("clearvault")).setExecutor(new ClearCommand(vaultManager));
     }
 
-    private URL getDownload(String name) {
+    private static URL getDownload(String name) {
         try {
             if (name.equals("mysql")) {
                 return new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");

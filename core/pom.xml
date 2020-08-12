@@ -40,12 +40,14 @@
             <groupId>software.bigbade.playervaults</groupId>
             <artifactId>mysql</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <!--MySQL connector-->
         <dependency>
             <groupId>software.bigbade.playervaults</groupId>
             <artifactId>mongo</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <!--TaskChain Bukkit-->
         <dependency>
