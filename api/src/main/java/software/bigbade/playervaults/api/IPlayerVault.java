@@ -3,9 +3,9 @@ package software.bigbade.playervaults.api;
 import org.bukkit.inventory.Inventory;
 
 public interface IPlayerVault {
-    Inventory getInventory();
+  Inventory getInventory();
 
-    int getNumber();
+  int getNumber();
 
-    void toggleClosed();
+  void toggleClosed();
 }
