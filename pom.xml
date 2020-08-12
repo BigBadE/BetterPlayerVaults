@@ -23,7 +23,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>software.bigbade.playervaults</groupId>
     <artifactId>better-player-vaults</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
+
+    <modules>
+        <module>mysql</module>
+        <module>mongo</module>
+        <module>api</module>
+        <module>core</module>
+    </modules>
 
     <repositories>
         <!--Spigot-->
@@ -36,10 +44,10 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
-        <!--BStats-->
+        <!--Custom TaskChain-->
         <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -50,34 +58,6 @@
     </properties>
 
     <dependencies>
-        <!--Spigot-->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--MongoDB-->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--MySQL-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.21</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--Uses for stats-->
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>1.7</version>
-            <scope>compile</scope>
-        </dependency>
         <!--All the testing APIs used for Unit Tests-->
         <dependency>
             <groupId>junit</groupId>

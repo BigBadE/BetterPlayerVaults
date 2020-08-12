@@ -1,0 +1,32 @@
+#BetterPlayerVaults configuration
+
+#Send statistics to BStats. Viewable at:
+stats: true
+
+#How the vaults are saved. Choices are: persistent (Stores PersistentData), flatfile (writes data to a flatfile)
+save-type: "persistent"
+
+#Default language
+language: "english"
+
+# Whether to use shared libraries, disable if there are ClassNotFoundExceptions
+use-shared-libraries: true
+
+#Compression level, number from 1-9 (inclusive), higher compression means less space taken but more time used compressing.
+compression-level: 3
+
+#Settings for MySQL
+database:
+  #URL to server
+  #Mongo default: mongodb://localhost:27018
+  url: "mysql://localhost:3306"
+  #Username
+  username: "root"
+  #Password
+  password: ""
+  #Table name
+  table-name: "players"
+  #Database to use
+  database: "better_player_vaults"
+  #Encryption method, MongoDB only.
+  encryption: DEFAULT
