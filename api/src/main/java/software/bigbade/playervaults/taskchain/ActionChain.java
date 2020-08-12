@@ -19,6 +19,11 @@ public class ActionChain {
     return this;
   }
 
+  public ActionChain sync(EnchantmentTask task) {
+    taskChain.sync(task);
+    return this;
+  }
+
   public void execute() { taskChain.execute(); }
 
   @FunctionalInterface

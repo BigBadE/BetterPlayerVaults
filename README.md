@@ -19,13 +19,13 @@ Open a CMD prompt in administrator mode and cd to this directory. Run the
 command:
 
 ```
-mklink /D core\src\main\java\software\bigbade\playervaults\mysql "..\..\..\..\..\..\..\..\mysql\src\main\java\software\bigbade\playervaults\mysql"
+mklink /D core\src\main\java\software\bigbade\playervaults\mysql "..\..\..\..\..\..\..\mysql\src\main\java\software\bigbade\playervaults\mysql"
 ```
 
 and
 
 ```
-mklink /D core\src\main\java\software\bigbade\playervaults\mongo "..\..\..\..\..\..\..\..\mongo\src\main\java\software\bigbade\playervaults\mongo"
+mklink /D core\src\main\java\software\bigbade\playervaults\mongo "..\..\..\..\..\..\..\mongo\src\main\java\software\bigbade\playervaults\mongo"
 ```
 
 ### Linux

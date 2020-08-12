@@ -56,7 +56,6 @@ public class BetterPlayerVaults extends PlayerVaults {
             name = "Mongo";
         }
         String link = "https://github.com/BigBadE/BetterPlayerVaults/releases/download/" + getLatestVersion() + "/BetterPlayerVaults-" + name + "-" + getLatestVersion() + ".jar";
-        System.out.println("Link: " + link);
         return FileUtils.getURL(link);
     }
 
@@ -81,6 +80,10 @@ public class BetterPlayerVaults extends PlayerVaults {
             messageManager.setMainLanguage(configuration.getString("language", "english"));
 
             loadVaultLoader();
+
+            if(PlayerVaults.shouldUpdate()) {
+                FileUtils.copyURLToFile(VERSION_URL, new File(getDataFolder(), VERSION_YML));
+            }
         }).execute();
 
         if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {

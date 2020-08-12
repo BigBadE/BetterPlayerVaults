@@ -15,12 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class PlayerVaults extends JavaPlugin {
-    private static final URL VERSION_URL = FileUtils.getURL("https://raw.githubusercontent.com/BigBadE/BetterPlayerVaults/release/version.yml");
-    private static final String VERSION_YML = "version.yml";
+    public static final URL VERSION_URL = FileUtils.getURL("https://raw.githubusercontent.com/BigBadE/BetterPlayerVaults/release/version.yml");
+    public static final String VERSION_YML = "version.yml";
     @Getter
     private static Logger pluginLogger;
 
@@ -53,14 +52,14 @@ public abstract class PlayerVaults extends JavaPlugin {
             setVersion("INSTALL");
         } else {
             byte[] data = FileUtils.read(versionFile);
-            setVersion(new String(data, 10, data.length-11, StandardCharsets.UTF_8));
+            setVersion(new String(data, 10, data.length-12, StandardCharsets.UTF_8));
         }
         assert VERSION_URL != null;
         try (InputStream stream = FileUtils.createStream(VERSION_URL)) {
             byte[] buffer = new byte[256];
             assert stream != null;
             int read = stream.read(buffer);
-            String foundVersion = new String(buffer, 10, read-11, StandardCharsets.UTF_8);
+            String foundVersion = new String(buffer, 10, read-12, StandardCharsets.UTF_8);
             if(foundVersion.equals("404: Not Found")) {
                 foundVersion = version;
             }

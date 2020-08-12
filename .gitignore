@@ -62,4 +62,5 @@ Thumbs.db
 *.sh
 
 #Symbolic links
-core/src/main/java/software/bigbade/playervaults/loading/internal/*
+core/src/main/java/software/bigbade/playervaults/mysql
+core/src/main/java/software/bigbade/playervaults/mongo
