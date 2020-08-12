@@ -21,7 +21,6 @@ import java.util.logging.Level;
 
 public class MessageManager extends IMessageManager {
     private static final String TRANSLATION_URL = "https://gitcdn.link/repo/BigBadE/BPVTranslations/release/";
-    private static final String VERSION_YML = "version.yml";
 
     private final List<MessageBundle> messageBundles = new ArrayList<>();
 
@@ -86,23 +85,14 @@ public class MessageManager extends IMessageManager {
     }
 
     private static void checkVersion(File translationFolder) {
-        File versionFile = new File(translationFolder, VERSION_YML);
-        if(!versionFile.exists()) {
+        if(PlayerVaults.shouldUpdate()) {
             MessageManager.downloadTranslations(translationFolder);
-        } else {
-            byte[] version = FileUtils.read(versionFile);
-            URL ymlURL = FileUtils.getURL(TRANSLATION_URL + VERSION_YML);
-            if (FileUtils.compareURLContents(ymlURL, version)) {
-                MessageManager.downloadTranslations(translationFolder);
-            }
         }
     }
 
     private static void downloadTranslations(File translationFolder) {
         PlayerVaults.getPluginLogger().log(Level.INFO, "Downloading translations from {0}", TRANSLATION_URL);
         List<String> languages = MessageManager.getLanguages();
-        URL versionURL = FileUtils.getURL(TRANSLATION_URL + VERSION_YML);
-        FileUtils.copyURLToFile(versionURL, new File(translationFolder, VERSION_YML));
         for(String language : languages) {
             URL ymlURL = FileUtils.getURL(TRANSLATION_URL + language.toLowerCase() + ".yml");
             FileUtils.copyURLToFile(ymlURL, new File(translationFolder, language.toLowerCase() + ".yml"));

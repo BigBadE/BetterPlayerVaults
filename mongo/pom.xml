@@ -19,6 +19,7 @@
             <groupId>software.bigbade.playervaults</groupId>
             <artifactId>api</artifactId>
             <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
         <!--MongoDB-->
         <dependency>
@@ -42,6 +43,7 @@
                         </goals>
                         <configuration>
                             <minimizeJar>true</minimizeJar>
+                            <finalName>BetterPlayerVaults-Mongo</finalName>
                         </configuration>
                     </execution>
                 </executions>

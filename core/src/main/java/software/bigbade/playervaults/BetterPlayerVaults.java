@@ -10,18 +10,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPluginLoader;
+import software.bigbade.playervaults.api.IVaultLoader;
+import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.command.ClearCommand;
 import software.bigbade.playervaults.command.VaultCommand;
 import software.bigbade.playervaults.impl.TaskChainFactoryImpl;
 import software.bigbade.playervaults.listener.VaultCloseListener;
-import software.bigbade.playervaults.api.IVaultLoader;
 import software.bigbade.playervaults.loading.LibraryLoader;
 import software.bigbade.playervaults.managers.LoaderFactory;
 import software.bigbade.playervaults.managers.MessageManager;
 import software.bigbade.playervaults.managers.MetricsManager;
 import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.taskchain.ActionChain;
-import software.bigbade.playervaults.api.IVaultManager;
 import software.bigbade.playervaults.utils.CompressionUtil;
 
 import java.io.File;
@@ -49,6 +49,21 @@ public class BetterPlayerVaults extends PlayerVaults {
         super(loader, description, dataFolder, file);
     }
 
+    private static URL getDownload(String name) {
+        if (name.equals("mysql")) {
+            name = "MySQL";
+        } else if (name.equals("mongo")) {
+            name = "Mongo";
+        }
+        String link = "https://github.com/BigBadE/BetterPlayerVaults/releases/download/" + getLatestVersion() + "/BetterPlayerVaults-" + name + "-" + getLatestVersion() + ".jar";
+        try {
+            return new URL(link);
+        } catch (MalformedURLException e) {
+            getPluginLogger().log(Level.SEVERE, "It seems the maven repo for the driver was deleted");
+        }
+        return null;
+    }
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -59,13 +74,18 @@ public class BetterPlayerVaults extends PlayerVaults {
 
         taskChainFactory = BukkitTaskChainFactory.create(this);
 
+        initVersion();
+
         new TaskChainFactoryImpl(this);
 
-        loadVaultLoader();
+        new ActionChain().async(() -> {
+            MessageManager messageManager = new MessageManager();
 
-        if (!isEnabled()) {
-            return;
-        }
+            messageManager.loadMessages(getDataFolder());
+            messageManager.setMainLanguage(configuration.getString("language", "english"));
+
+            loadVaultLoader();
+        }).execute();
 
         if (configuration.getBoolean("stats", true) && !Metrics.class.getPackage().getName().equals("org.bstats.bukkit")) {
             new MetricsManager(this);
@@ -82,7 +102,6 @@ public class BetterPlayerVaults extends PlayerVaults {
         return taskChainFactory.newSharedChain(name);
     }
 
-
     private void loadVaultLoader() {
         String loader = Objects.requireNonNull(configuration.getString("save-type", (MC_VERSION >= 14) ? "persistent" : "flatfile")).toLowerCase();
         Objects.requireNonNull(loader);
@@ -93,20 +112,18 @@ public class BetterPlayerVaults extends PlayerVaults {
             Bukkit.getPluginManager().disablePlugin(this);
         } else {
             if (loader.equals("mysql") || loader.equals("mongo")) {
-                new ActionChain().async(() -> {
-                    LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig());
-                    libraryLoader.loadLibrary(loader, BetterPlayerVaults.getDownload(loader));
-                    ConfigurationSection section = configuration.getConfigurationSection("database");
-                    if(section == null) {
-                        section = configuration.createSection("database");
-                    }
-                    vaultLoader = libraryLoader.getVaultLoader(section);
-                    finishLoading();
-                }).execute();
+                LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig());
+                libraryLoader.loadLibrary(loader, BetterPlayerVaults.getDownload(loader));
+                ConfigurationSection section = configuration.getConfigurationSection("database");
+                if (section == null) {
+                    section = configuration.createSection("database");
+                }
+                vaultLoader = libraryLoader.getVaultLoader(section);
+                finishLoading();
             } else {
                 vaultLoader = loaderFactory.getVaultLoader(loader);
-                finishLoading();
             }
+            finishLoading();
         }
     }
 
@@ -116,29 +133,15 @@ public class BetterPlayerVaults extends PlayerVaults {
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
-        MessageManager messageManager = new MessageManager();
-
-        messageManager.loadMessages(getDataFolder());
-        messageManager.setMainLanguage(configuration.getString("language", "english"));
-
         vaultManager = new VaultManager(vaultLoader);
+
+        if (!isEnabled()) {
+            return;
+        }
 
         Bukkit.getPluginManager().registerEvents(new VaultCloseListener(vaultManager), this);
         Objects.requireNonNull(getCommand("playervault")).setExecutor(new VaultCommand(vaultManager));
         Objects.requireNonNull(getCommand("clearvault")).setExecutor(new ClearCommand(vaultManager));
-    }
-
-    private static URL getDownload(String name) {
-        try {
-            if (name.equals("mysql")) {
-                return new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
-            } else {
-                return new URL("https://repo1.maven.org/maven2/org/mongodb/bson/4.1.0/bson-4.1.0.jar");
-            }
-        } catch (MalformedURLException e) {
-            getPluginLogger().log(Level.SEVERE, "It seems the maven repo for the driver was deleted");
-        }
-        return null;
     }
 
     @Override

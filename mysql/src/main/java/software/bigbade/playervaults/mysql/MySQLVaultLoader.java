@@ -60,7 +60,7 @@ public class MySQLVaultLoader extends ExternalDataLoader {
             return tableName;
         }
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = " + tableName + " AND TABLE_SCHEMA = 'BetterPlayerVaults' LIMIT 1;")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT " + tableName + " FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'BetterPlayerVaults' LIMIT 1;")) {
             resultSet = statement.executeQuery();
             if (!resultSet.next()) {
                 try (PreparedStatement createTable = connection.prepareStatement("CREATE TABLE " + tableName + "(uuid CHAR(36) NOT NULL PRIMARY KEY, number INT NOT NULL, inventory TEXT NOT NULL);")) {

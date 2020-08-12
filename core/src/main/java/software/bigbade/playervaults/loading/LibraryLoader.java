@@ -2,6 +2,7 @@ package software.bigbade.playervaults.loading;
 
 import lombok.SneakyThrows;
 import org.bukkit.configuration.ConfigurationSection;
+import software.bigbade.playervaults.impl.PlayerVault;
 import software.bigbade.playervaults.mongo.MongoVaultLoader;
 import software.bigbade.playervaults.PlayerVaults;
 import software.bigbade.playervaults.api.IVaultLoader;
@@ -109,6 +110,9 @@ public class LibraryLoader {
             }
         }
         File file = new File(libraryFolder, name + ".jar");
+        if(PlayerVaults.shouldUpdate() && file.exists()) {
+            FileUtils.delete(file);
+        }
         if (!file.exists()) {
             LibraryLoader.downloadJar(file, download);
         }

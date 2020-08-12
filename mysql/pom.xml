@@ -43,6 +43,7 @@
                         </goals>
                         <configuration>
                             <minimizeJar>true</minimizeJar>
+                            <finalName>BetterPlayerVaults-MySQL</finalName>
                         </configuration>
                     </execution>
                 </executions>
