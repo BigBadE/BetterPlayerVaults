@@ -12,6 +12,7 @@ import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultLoader;
 import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.serialization.SerializationUtils;
+import software.bigbade.playervaults.taskchain.ActionChain;
 import software.bigbade.playervaults.utils.VaultSizeUtil;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class PersistentVaultLoader implements IVaultLoader {
     @Override
     public CompletableFuture<Inventory> getVault(Player player, int vault) {
         CompletableFuture<Inventory> future = new CompletableFuture<>();
-        vaults.getSchedulerManager().runTaskAsync(() -> {
+        new ActionChain(player.getUniqueId().toString()).async(() -> {
             PersistentDataContainer data = player.getPersistentDataContainer();
             NamespacedKey key = getKey(vault);
             if (!data.has(key, PersistentDataType.BYTE_ARRAY)) {
@@ -38,7 +39,7 @@ public class PersistentVaultLoader implements IVaultLoader {
             byte[] serialized = data.get(keys.get(vault), PersistentDataType.BYTE_ARRAY);
             Objects.requireNonNull(serialized);
             future.complete(SerializationUtils.deserialize(serialized, VaultManager.VAULT_TITLE.translate(vault), VaultSizeUtil.getSize(player)));
-        });
+        }).execute();
         return future;
     }
 

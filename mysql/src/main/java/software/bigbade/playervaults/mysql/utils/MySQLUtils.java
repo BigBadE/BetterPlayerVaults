@@ -1,6 +1,7 @@
-package software.bigbade.playervaults.utils;
+package software.bigbade.playervaults.mysql.utils;
 
 import software.bigbade.playervaults.PlayerVaults;
+import software.bigbade.playervaults.loading.ExternalDataLoader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +19,7 @@ public final class MySQLUtils {
         try {
             closeable.close();
         } catch (Exception e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error closing connection", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error closing connection", e);
         }
     }
 
@@ -26,7 +27,7 @@ public final class MySQLUtils {
         try {
             return connection.prepareStatement(statement);
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error creating statement", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error creating statement", e);
             return null;
         }
     }
@@ -35,7 +36,7 @@ public final class MySQLUtils {
         try {
             statement.setString(1, string);
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, PARAM_ERROR, e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, PARAM_ERROR, e);
         }
     }
 
@@ -43,7 +44,7 @@ public final class MySQLUtils {
         try {
             statement.setInt(2, integer);
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, PARAM_ERROR, e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, PARAM_ERROR, e);
         }
     }
 
@@ -51,7 +52,7 @@ public final class MySQLUtils {
         try {
             statement.setBytes(3, bytes);
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, PARAM_ERROR, e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, PARAM_ERROR, e);
         }
     }
 
@@ -59,7 +60,7 @@ public final class MySQLUtils {
         try {
             return result.getBytes(1);
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, PARAM_ERROR, e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, PARAM_ERROR, e);
             return new byte[0];
         }
     }
@@ -68,7 +69,7 @@ public final class MySQLUtils {
         try {
             return statement.executeQuery();
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error executing query", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error executing query", e);
             return null;
         }
     }
@@ -77,7 +78,7 @@ public final class MySQLUtils {
         try {
             statement.executeUpdate();
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error updating database", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error updating database", e);
         }
     }
 
@@ -85,7 +86,7 @@ public final class MySQLUtils {
         try {
             return statement.isClosed();
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error checking status of statement", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error checking status of statement", e);
             return true;
         }
     }
@@ -94,7 +95,7 @@ public final class MySQLUtils {
         try {
             return result.next();
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error advancing result set", e);
+            ExternalDataLoader.getLogger().log(Level.SEVERE, "Error advancing result set", e);
             return false;
         }
     }

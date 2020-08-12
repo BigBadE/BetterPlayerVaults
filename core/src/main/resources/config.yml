@@ -1,6 +1,6 @@
 #BetterPlayerVaults configuration
 
-#Send statistics to BStats. Viewable at:
+#Send statistics to BStats. Viewable at: https://bstats.org/plugin/bukkit/BetterPlayerVaults/7137
 stats: true
 
 #How the vaults are saved. Choices are: persistent (Stores PersistentData), flatfile (writes data to a flatfile)

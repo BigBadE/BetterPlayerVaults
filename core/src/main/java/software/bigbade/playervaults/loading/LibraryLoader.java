@@ -2,8 +2,12 @@ package software.bigbade.playervaults.loading;
 
 import lombok.SneakyThrows;
 import org.bukkit.configuration.ConfigurationSection;
+import software.bigbade.playervaults.mongo.MongoVaultLoader;
 import software.bigbade.playervaults.PlayerVaults;
+import software.bigbade.playervaults.api.IVaultLoader;
+import software.bigbade.playervaults.mysql.MySQLVaultLoader;
 import software.bigbade.playervaults.utils.FileUtils;
+import software.bigbade.playervaults.utils.ReflectionUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -20,6 +24,7 @@ import java.util.logging.Level;
 public class LibraryLoader {
     private final ConfigurationSection section;
     private final File libraryFolder;
+    private Class<? extends IVaultLoader> vaultLoader;
 
     public LibraryLoader(String dataFolder, ConfigurationSection section) {
         this.section = section;
@@ -36,22 +41,6 @@ public class LibraryLoader {
             return "com.mongodb.client.MongoClient";
         }
         throw new IllegalArgumentException("Unknown driver " + name);
-    }
-
-    private void loadJar(File file, URLClassLoader classLoader) {
-        try (JarFile jarFile = new JarFile(file)) {
-            Enumeration<JarEntry> enumerator = jarFile.entries();
-            while (enumerator.hasMoreElements()) {
-                JarEntry jar = enumerator.nextElement();
-                if (jar.isDirectory() || !jar.getName().endsWith(".class")) {
-                    continue;
-                }
-
-                loadClass(jar, classLoader);
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not load external jar file", e);
-        }
     }
 
     private static void downloadJar(File file, URL download) {
@@ -72,40 +61,72 @@ public class LibraryLoader {
         }
     }
 
+    private void loadJar(File file, URLClassLoader classLoader) {
+        try (JarFile jarFile = new JarFile(file)) {
+            Enumeration<JarEntry> enumerator = jarFile.entries();
+            while (enumerator.hasMoreElements()) {
+                JarEntry jar = enumerator.nextElement();
+                if (jar.isDirectory() || !jar.getName().endsWith(".class")) {
+                    continue;
+                }
+
+                loadClass(jar, classLoader);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Could not load external jar file", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     private void loadClass(JarEntry jar, ClassLoader loader) throws ClassNotFoundException {
         String className = jar.getName().substring(0, jar.getName().length() - 6);
         className = className.replace('/', '.');
-        loader.loadClass(className);
+        Class<?> clazz = loader.loadClass(className);
+        if (IVaultLoader.class.isAssignableFrom(clazz)) {
+            vaultLoader = (Class<IVaultLoader>) clazz;
+        }
     }
 
     @SneakyThrows
-    public void loadLibrary(String name, URL[] downloads) {
+    public void loadLibrary(String name, URL download) {
         if (section.getBoolean("use-shared-libraries")) {
             try {
                 Class.forName(LibraryLoader.getDriverClass(name), false, getClass().getClassLoader());
                 PlayerVaults.getPluginLogger().log(Level.INFO, "The library for {0} detected in classpath. If any ClassNotFoundExceptions are thrown, disable shared libs in the config.", name);
+                switch (name) {
+                    case "mongo":
+                        vaultLoader = MongoVaultLoader.class;
+                        break;
+                    case "mysql":
+                        vaultLoader = MySQLVaultLoader.class;
+                        break;
+                    default:
+                        throw new IllegalStateException("Loader " + name + " has no class!");
+                }
                 return;
             } catch (ClassNotFoundException ignored) {
                 PlayerVaults.getPluginLogger().log(Level.INFO, "No {0} library found, manually getting it", name);
             }
         }
-        URL[] urls = new URL[downloads.length];
-        File[] files = new File[downloads.length];
-        int number = 1;
-        for (URL download : downloads) {
-            File file = new File(libraryFolder, name + "-" + number + ".jar");
-            if (!file.exists()) {
-                LibraryLoader.downloadJar(file, download);
-            }
-            files[number - 1] = file;
-            urls[number - 1] = new URL("jar:file:" + file.getAbsolutePath() + "!/");
-            number++;
+        File file = new File(libraryFolder, name + ".jar");
+        if (!file.exists()) {
+            LibraryLoader.downloadJar(file, download);
         }
+        URL[] urls = new URL[]{new URL("jar:file:" + file.getAbsolutePath() + "!/")};
 
         try (URLClassLoader classLoader = new URLClassLoader(urls, getClass().getClassLoader())) {
-            for (File file : files) {
-                loadJar(file, classLoader);
-            }
+            loadJar(file, classLoader);
         }
+    }
+
+    public IVaultLoader getVaultLoader(ConfigurationSection section) {
+        DatabaseSettings.DatabaseSettingsBuilder builder = DatabaseSettings.builder();
+        builder.url(section.getString("url", "mysql://localhost:3306"));
+        builder.database(section.getString("database", "better_player_vaults"));
+        builder.username(section.getString("username", "root"));
+        builder.password(section.getString("password", ""));
+        builder.tableName(section.getString("table-name", "better_player_vaults"));
+        builder.security(section.getString("encryption", "DEFAULT"));
+        return ReflectionUtils.instantiate(vaultLoader, builder.build());
     }
 }

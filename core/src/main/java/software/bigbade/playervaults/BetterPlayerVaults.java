@@ -6,6 +6,7 @@ import co.aikar.taskchain.TaskChainFactory;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPluginLoader;
@@ -19,8 +20,8 @@ import software.bigbade.playervaults.managers.MessageManager;
 import software.bigbade.playervaults.managers.MetricsManager;
 import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.taskchain.ActionChain;
-import software.bigbade.playervaults.utils.CompressionUtil;
 import software.bigbade.playervaults.api.IVaultManager;
+import software.bigbade.playervaults.utils.CompressionUtil;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -90,8 +91,13 @@ public class BetterPlayerVaults extends PlayerVaults {
         } else {
             if (loader.equals("mysql") || loader.equals("mongo")) {
                 new ActionChain().async(() -> {
-                    new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig()).loadLibrary(loader, getDownload(loader));
-                    vaultLoader = loaderFactory.getVaultLoader(loader);
+                    LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig());
+                    libraryLoader.loadLibrary(loader, getDownload(loader));
+                    ConfigurationSection section = configuration.getConfigurationSection("database");
+                    if(section == null) {
+                        section = configuration.createSection("database");
+                    }
+                    vaultLoader = libraryLoader.getVaultLoader(section);
                     finishLoading();
                 }).execute();
             } else {
@@ -119,25 +125,17 @@ public class BetterPlayerVaults extends PlayerVaults {
         Objects.requireNonNull(getCommand("clearvault")).setExecutor(new ClearCommand(vaultManager));
     }
 
-    private URL[] getDownload(String name) {
+    private URL getDownload(String name) {
         try {
             if (name.equals("mysql")) {
-                return new URL[]{/*new URL(""),
-                        new URL("https://repo1.maven.org/maven2/org/jboss/jbossas/jboss-as-connector/6.1.0.Final/jboss-as-connector-6.1.0.Final.jar"),
-                        new URL("https://repo1.maven.org/maven2/com/mchange/mchange-commons-java/0.2.20/mchange-commons-java-0.2.20.jar"),
-                        new URL("https://repo1.maven.org/maven2/com/mchange/c3p0/0.9.5.5/c3p0-0.9.5.5.jar"),*/
-                        new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar")};
+                return new URL("https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.21/mysql-connector-java-8.0.21.jar");
             } else {
-                //Libs must be loaded in order of dependency
-                //Gson -> Core -> Sync
-                return new URL[]{new URL("https://repo1.maven.org/maven2/org/mongodb/bson/4.1.0/bson-4.1.0.jar"),
-                        new URL("https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/4.1.0/mongodb-driver-core-4.1.0.jar"),
-                        new URL("https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/4.1.0/mongodb-driver-sync-4.1.0.jar")};
+                return new URL("https://repo1.maven.org/maven2/org/mongodb/bson/4.1.0/bson-4.1.0.jar");
             }
         } catch (MalformedURLException e) {
             getPluginLogger().log(Level.SEVERE, "It seems the maven repo for the driver was deleted");
         }
-        return new URL[0];
+        return null;
     }
 
     @Override

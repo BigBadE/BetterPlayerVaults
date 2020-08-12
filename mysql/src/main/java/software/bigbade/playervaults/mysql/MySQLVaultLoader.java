@@ -1,7 +1,8 @@
-package software.bigbade.playervaults.loading;
+package software.bigbade.playervaults.mysql;
 
-import software.bigbade.playervaults.PlayerVaults;
-import software.bigbade.playervaults.utils.MySQLUtils;
+import software.bigbade.playervaults.loading.DatabaseSettings;
+import software.bigbade.playervaults.loading.ExternalDataLoader;
+import software.bigbade.playervaults.mysql.utils.MySQLUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +24,7 @@ public class MySQLVaultLoader extends ExternalDataLoader {
         try {
             connection = DriverManager.getConnection("jdbc:" + settings.getUrl(), settings.getUsername(), settings.getPassword());
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error loading database (check the URL!)", e);
+            getLogger().log(Level.SEVERE, "Error loading database (check the URL!)", e);
             return;
         }
 
@@ -35,7 +36,7 @@ public class MySQLVaultLoader extends ExternalDataLoader {
 
     private void getDatabase(String database) {
         if (NAME_PATTERN.matcher(database).matches()) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "ILLEGAL CHARACTER DETECTED IN DATABASE NAME. POSSIBLE MYSQL INJECTION!");
+            getLogger().log(Level.SEVERE, "ILLEGAL CHARACTER DETECTED IN DATABASE NAME. POSSIBLE MYSQL INJECTION!");
             database = "better_player_vaults";
         }
         PreparedStatement statement = MySQLUtils.getStatement(connection,
@@ -54,7 +55,7 @@ public class MySQLVaultLoader extends ExternalDataLoader {
 
     private String createTable(String tableName) {
         if (NAME_PATTERN.matcher(tableName).matches()) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "ILLEGAL CHARACTER DETECTED IN TABLE NAME. POSSIBLE MYSQL INJECTION!");
+            getLogger().log(Level.SEVERE, "ILLEGAL CHARACTER DETECTED IN TABLE NAME. POSSIBLE MYSQL INJECTION!");
             tableName = "players";
             return tableName;
         }
@@ -67,7 +68,7 @@ public class MySQLVaultLoader extends ExternalDataLoader {
                 }
             }
         } catch (SQLException e) {
-            PlayerVaults.getPluginLogger().log(Level.SEVERE, "Error getting/creating table", e);
+            getLogger().log(Level.SEVERE, "Error getting/creating table", e);
         } finally {
             if (resultSet != null) {
                 MySQLUtils.safeClose(resultSet);

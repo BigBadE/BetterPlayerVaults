@@ -1,4 +1,4 @@
-package software.bigbade.playervaults;
+package software.bigbade.playervaults.mongo;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -31,7 +31,7 @@ public class MongoVaultLoader extends ExternalDataLoader {
                 break;
             case "PLAIN":
                 builder.credential(MongoCredential.createPlainCredential(settings.getUsername(), settings.getDatabase(), settings.getPassword().toCharArray()));
-                PlayerVaults.getPluginLogger().log(Level.WARNING, "PLAIN VERIFICATION IS ENABLED. THIS IS A SERIOUS SECURITY BREACH!");
+                getLogger().log(Level.WARNING, "PLAIN VERIFICATION IS ENABLED. THIS IS A SERIOUS SECURITY BREACH!");
                 break;
             case "X509":
                 builder.credential(MongoCredential.createMongoX509Credential());
@@ -44,7 +44,7 @@ public class MongoVaultLoader extends ExternalDataLoader {
         collection = client.getDatabase(settings.getDatabase()).getCollection(settings.getTableName());
 
         if (collection == null) {
-            PlayerVaults.getPluginLogger().log(Level.INFO, "Creating new database section");
+            getLogger().log(Level.INFO, "Creating new database section");
             client.getDatabase(settings.getDatabase()).createCollection(settings.getTableName());
             collection = client.getDatabase(settings.getDatabase()).getCollection(settings.getTableName());
         }

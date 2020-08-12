@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultLoader;
-import software.bigbade.playervaults.managers.VaultManager;
 import software.bigbade.playervaults.serialization.SerializationUtils;
 import software.bigbade.playervaults.taskchain.ActionChain;
 import software.bigbade.playervaults.utils.FileUtils;

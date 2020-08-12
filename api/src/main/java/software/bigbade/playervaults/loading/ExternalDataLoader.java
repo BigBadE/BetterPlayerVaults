@@ -1,8 +1,10 @@
 package software.bigbade.playervaults.loading;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import software.bigbade.playervaults.PlayerVaults;
 import software.bigbade.playervaults.api.IPlayerVault;
 import software.bigbade.playervaults.api.IVaultLoader;
 import software.bigbade.playervaults.messages.StringMessage;
@@ -12,9 +14,12 @@ import software.bigbade.playervaults.utils.VaultSizeUtil;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 public abstract class ExternalDataLoader implements IVaultLoader {
     public static final StringMessage VAULT_TITLE = new StringMessage("title.vault");
+    @Getter
+    private static final Logger logger = PlayerVaults.getPluginLogger();
 
     @Override
     public CompletableFuture<Inventory> getVault(Player player, int vault) {
@@ -45,15 +50,9 @@ public abstract class ExternalDataLoader implements IVaultLoader {
     public abstract void saveData(UUID player, int number, byte[] data);
 
     @Override
-    public abstract String getName();
-
-    @Override
     public void resetVault(Player player, int number) {
         resetVault(player.getUniqueId(), number);
     }
-
-    @Override
-    public abstract void resetVault(UUID player, int number);
 
     @Override
     public boolean worksOffline() {
