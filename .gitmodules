@@ -1,3 +1,4 @@
-[submodule "src/main/resources/translations"]
-	path = src/main/resources/translations
+[submodule "translations"]
+	path = translations
 	url = https://github.com/BigBadE/BPVTranslations
+	update = rebase

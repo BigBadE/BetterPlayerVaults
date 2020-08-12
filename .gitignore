@@ -60,3 +60,6 @@ dist/
 manifest.mf
 Thumbs.db
 *.sh
+
+#Symbolic links
+core/src/main/java/software/bigbade/playervaults/loading/internal/*
