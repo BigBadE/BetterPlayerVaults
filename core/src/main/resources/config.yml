@@ -3,7 +3,7 @@
 #Send statistics to BStats. Viewable at: https://bstats.org/plugin/bukkit/BetterPlayerVaults/7137
 stats: true
 
-#How the vaults are saved. Choices are: persistent (Stores PersistentData), flatfile (writes data to a flatfile)
+#How the vaults are saved. Choices are: persistent (Stores PersistentData), flatfile (writes data to a flatfile), mysql, mongo
 save-type: "persistent"
 
 #Default language
@@ -18,7 +18,7 @@ compression-level: 3
 #Settings for MySQL
 database:
   #URL to server
-  #Mongo default: mongodb://localhost:27018
+  #Mongo default: mongodb://localhost:27017
   url: "mysql://localhost:3306"
   #Username
   username: "root"

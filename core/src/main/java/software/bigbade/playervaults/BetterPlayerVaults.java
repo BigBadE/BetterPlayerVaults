@@ -111,13 +111,13 @@ public class BetterPlayerVaults extends PlayerVaults {
             Bukkit.getPluginManager().disablePlugin(this);
         } else {
             if (loader.equals("mysql") || loader.equals("mongo")) {
-                LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), getConfig());
-                libraryLoader.loadLibrary(loader, BetterPlayerVaults.getDownload(loader));
                 ConfigurationSection section = configuration.getConfigurationSection("database");
                 if (section == null) {
                     section = configuration.createSection("database");
                 }
-                vaultLoader = libraryLoader.getVaultLoader(section);
+                LibraryLoader libraryLoader = new LibraryLoader(getDataFolder().getAbsolutePath(), section);
+                libraryLoader.loadLibrary(loader, BetterPlayerVaults.getDownload(loader));
+                vaultLoader = libraryLoader.getVaultLoader();
                 finishLoading();
             } else {
                 vaultLoader = loaderFactory.getVaultLoader(loader);

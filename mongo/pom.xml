@@ -44,6 +44,12 @@
                         <configuration>
                             <minimizeJar>true</minimizeJar>
                             <finalName>BetterPlayerVaults-Mongo</finalName>
+                            <relocations>
+                                <relocation>
+                                    <pattern>software.bigbade.playervaults.mongo</pattern>
+                                    <shadedPattern>software.bigbade.playervaults.external.mongo</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

@@ -44,6 +44,12 @@
                         <configuration>
                             <minimizeJar>true</minimizeJar>
                             <finalName>BetterPlayerVaults-MySQL</finalName>
+                            <relocations>
+                                <relocation>
+                                    <pattern>software.bigbade.playervaults.mysql</pattern>
+                                    <shadedPattern>software.bigbade.playervaults.external.mysql</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

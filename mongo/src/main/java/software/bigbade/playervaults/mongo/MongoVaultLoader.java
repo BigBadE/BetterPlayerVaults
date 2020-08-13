@@ -56,14 +56,6 @@ public class MongoVaultLoader extends ExternalDataLoader {
         client = MongoClients.create(builder.build());
         collection = client.getDatabase(settings.getDatabase())
                 .getCollection(settings.getTableName());
-
-        if (collection == null) {
-            getLogger().log(Level.INFO, "Creating new database section");
-            client.getDatabase(settings.getDatabase())
-                    .createCollection(settings.getTableName());
-            collection = client.getDatabase(settings.getDatabase())
-                    .getCollection(settings.getTableName());
-        }
     }
 
     @Override
@@ -83,7 +75,7 @@ public class MongoVaultLoader extends ExternalDataLoader {
     @Override
     public void saveData(UUID player, int number, byte[] data) {
         collection.updateOne(
-                Filters.and(Filters.eq("uuid", player), Filters.eq("id", number)),
+                Filters.and(Filters.eq("uuid", player.toString()), Filters.eq("id", number)),
                 Updates.combine(Updates.set(
                         "inventory", new String(data, StandardCharsets.ISO_8859_1))));
     }
@@ -96,7 +88,7 @@ public class MongoVaultLoader extends ExternalDataLoader {
     @Override
     public void resetVault(UUID player, int number) {
         collection.deleteOne(
-                Filters.and(Filters.eq("uuid", player), Filters.eq("id", number)));
+                Filters.and(Filters.eq("uuid", player.toString()), Filters.eq("id", number)));
     }
 
     @Override
